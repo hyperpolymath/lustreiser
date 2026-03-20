@@ -1,0 +1,51 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Lustreiser
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc: left
+:icons: font
+
+== What Is This?
+
+Lustreiser generates **formally verified real-time embedded code** via
+Lustre/Esterel synchronous reactive programming.
+
+Used in avionics and nuclear plants, Lustre can prove that real-time
+deadlines are always met. Lustreiser brings this to IoT and embedded systems.
+
+== How It Works
+
+Describe your reactive system in `lustreiser.toml`. Lustreiser:
+
+1. Generates Lustre node definitions from your timing requirements
+2. Formally verifies all real-time deadlines are satisfiable
+3. Compiles to deterministic C code (no malloc, no recursion)
+4. Creates a Zig FFI bridge for integration
+
+== Key Value
+
+* **Proven timing guarantees** — deadlines are formally verified
+* **Deterministic execution** — no jitter, no surprises
+* **Safety-critical quality** for IoT and embedded systems
+
+== Architecture
+
+Follows the hyperpolymath -iser pattern (same as https://github.com/hyperpolymath/chapeliser[Chapeliser]):
+
+* **Manifest** (`lustreiser.toml`) — describe WHAT you want
+* **Idris2 ABI** (`src/abi/`) — formal proofs of interface correctness
+* **Zig FFI** (`ffi/zig/`) — C-ABI bridge to target language runtime
+* **Codegen** (`src/codegen/`) — generates target language wrapper code
+* **Rust CLI** — parses manifest, validates, generates, builds, runs
+
+User writes zero target language code. Lustreiser generates everything.
+
+Part of the https://github.com/hyperpolymath/iseriser[-iser family] of acceleration frameworks.
+
+== Status
+
+**Pre-alpha.** Architecture defined, scaffolding in place, codegen pending.
+
+== License
+
+SPDX-License-Identifier: PMPL-1.0-or-later
