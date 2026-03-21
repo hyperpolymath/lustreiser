@@ -11,31 +11,30 @@
   (project-context
     (name "lustreiser")
     (description "Generate formally verified real-time embedded code via Lustre synchronous dataflow")
-    (status "scaffold-documented")
+    (status "phase-1-complete")
     (priority "—")
     (ecosystem "-iser family (https://github.com/hyperpolymath/iseriser)")
-    (domain "Safety-critical real-time embedded systems (avionics, nuclear, automotive)")
-    (target-standards "DO-178C, IEC 61508, ISO 26262"))
+    (domain "Safety-critical real-time embedded systems"))
 
   (current-position
-    (phase "scaffold-with-bespoke-docs")
-    (completion-percentage 10)
-    (milestone "Architecture defined, CLI scaffolded, RSR template complete, bespoke Idris2 ABI types defined"))
+    (phase "phase-1-complete")
+    (completion-percentage 45)
+    (milestone "Phase 1 complete — scaffold, CLI, manifest parser, codegen stubs, ABI types, RSR template"))
 
   (route-to-mvp
-    (step 1 "Implement control flow analysis — parse manifest to extract dataflow topology")
-    (step 2 "Implement Lustre node generation — produce .lus files with clock annotations")
-    (step 3 "Implement clock calculus — when/merge operators, clock consistency checking")
-    (step 4 "Implement WCET analysis — timing bounds for generated C code paths")
-    (step 5 "Write Idris2 proofs for timing bounds (WCET < clock period)")
-    (step 6 "Implement Lustre-to-C compilation backend (no malloc, no recursion)")
-    (step 7 "Integration tests with real embedded targets (ARM Cortex-M, RISC-V)")
-    (step 8 "First working end-to-end example (simple flight controller node)"))
+    (step 1 "Phase 1 — scaffold, CLI, manifest parser, ABI types [COMPLETE]")
+    (step 2 "Phase 2 — core domain logic implementation")
+    (step 3 "Phase 3 — Idris2 ABI formal proofs")
+    (step 4 "Phase 4 — Zig FFI bridge implementation")
+    (step 5 "Phase 5 — integration tests with real targets")
+    (step 6 "Phase 6 — documentation and examples")
+    (step 7 "Phase 7 — Chainguard container + CI hardening")
+    (step 8 "Phase 8 — first release (v0.1.0)"))
 
   (blockers-and-issues
-    (none "Project is in scaffold phase — no blockers yet"))
+    (none "No blockers — Phase 1 complete, ready for Phase 2"))
 
   (critical-next-actions
-    (action "Implement control flow analysis from lustreiser.toml manifest")
-    (action "Generate first .lus file from a simple dataflow specification")
-    (action "Define Lustre-specific manifest schema (nodes, clocks, streams, timing)")))
+    (action "Begin Phase 2 — implement core domain logic for lustreiser")
+    (action "Write property-based tests for manifest parsing")
+    (action "Define Idris2 ABI proof obligations for Phase 3")))

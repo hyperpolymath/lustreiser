@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath)
+= Changelog: lustreiser
+:toc:
+
+All notable changes to lustreiser will be documented in this file.
+
+This format is based on https://keepachangelog.com/en/1.1.0/[Keep a Changelog],
+and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
+
+== [0.1.0] - 2026-03-21
+
+=== Phase 1 — RSR Compliance Sweep
+
+=== Added
+* Phase 1 complete — scaffold, CLI, manifest parser, codegen stubs, ABI types
+* RSR compliance sweep — STATE.a2ml, contractiles, Justfile updated
+* Bespoke contractile constraints for Safety-critical real-time embedded systems domain
+* Project-specific Justfile recipes
+
+== [0.0.1] - 2026-03-20
+
+=== Added
+* Initial project scaffold from rsr-template-repo
+* CLI with subcommands (init, validate, generate, build, run, info)
+* Manifest parser (`lustreiser.toml`)
+* Codegen engine (stubs — target-language-specific implementation pending)
+* ABI module (Idris2 proof type definitions)
+* Library API for programmatic use
+* Full RSR template (17 CI workflows, governance docs, bot directives)
+* README.adoc with architecture overview and value proposition

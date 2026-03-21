@@ -67,3 +67,7 @@ These are hard requirements — CI fails if any check fails.
 - description: No Admitted in Coq code
 - run: "! grep -r 'Admitted' --include='*.v' . 2>/dev/null | grep -v node_modules | head -1 | grep -q ."
 - severity: critical
+
+## Domain-Specific Constraints (lustreiser)
+
+### lustre-timing-bounds\n- description: Generated Lustre code must have provable WCET bounds\n- target: All .lus output files carry timing annotations\n- severity: critical\n\n### no-malloc-in-output\n- description: Generated C code must not use dynamic allocation\n- target: Static allocation only (DO-178C compliance)\n- severity: critical\n\n### clock-consistency\n- description: All Lustre nodes must pass clock calculus verification\n- target: when/merge operators correctly typed\n- severity: critical

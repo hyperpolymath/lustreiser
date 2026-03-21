@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Intendfile — Design intent declarations for lustreiser
+# Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+
+@abstract:
+What lustreiser INTENDS to become. These are bespoke design goals
+specific to the Safety-critical real-time embedded systems domain.
+@end
+
+## Domain-Specific Intent
+
+### real-time-certification\n- description: Enable DO-178C/IEC-61508 certification for generated code\n- target: Traceable requirements, MC/DC coverage, formal WCET proofs\n- status: aspiration\n\n### multi-target-codegen\n- description: Generate code for ARM Cortex-M, RISC-V, and x86 targets\n- target: Platform-specific timing models\n- status: aspiration
+
+## Cross-Cutting Intent
+
+### iser-ecosystem-compatibility
+- description: Must interoperate with other -iser projects via shared ABI
+- target: Idris2 ABI + Zig FFI standard interface
+- status: in-progress
+
+### proven-integration
+- description: All formal proofs should be verifiable by the proven framework
+- target: Integration with hyperpolymath/proven
+- status: aspiration
