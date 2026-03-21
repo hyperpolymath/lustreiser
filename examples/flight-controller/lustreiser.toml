@@ -1,0 +1,79 @@
+# lustreiser manifest — Flight controller example
+# SPDX-License-Identifier: PMPL-1.0-or-later
+#
+# This manifest describes a simplified flight controller for a fixed-wing
+# aircraft. It demonstrates:
+#   - Multi-node decomposition (attitude control + navigation filter)
+#   - Multi-rate signals (GPS at 10Hz vs IMU at 200Hz)
+#   - DO-178C avionics safety standard
+#   - Tight WCET deadline (5ms)
+#
+# Usage:
+#   lustreiser validate -m examples/flight-controller/lustreiser.toml
+#   lustreiser generate -m examples/flight-controller/lustreiser.toml -o generated/flight-controller
+
+[project]
+name = "flight-controller"
+version = "1.0.0"
+
+# --- Attitude control node ---
+# Runs at 200Hz (5ms period). Takes Euler angle errors from the INS
+# and computes control surface deflection commands.
+[[nodes]]
+name = "attitude_ctrl"
+inputs = [
+    "pitch_err:real",
+    "roll_err:real",
+    "yaw_err:real",
+    "airspeed:real",
+]
+outputs = [
+    "elevator_cmd:real",
+    "aileron_cmd:real",
+    "rudder_cmd:real",
+]
+
+[nodes.clock]
+base-period-ms = 5
+
+# --- Navigation filter node ---
+# Runs at 200Hz base clock, but GPS inputs are sampled at 10Hz (every 20 ticks).
+# This requires Lustre clock calculus (when/merge) to handle rate adaptation.
+[[nodes]]
+name = "nav_filter"
+inputs = [
+    "imu_accel_x:real",
+    "imu_accel_y:real",
+    "imu_accel_z:real",
+    "imu_gyro_x:real",
+    "imu_gyro_y:real",
+    "imu_gyro_z:real",
+    "gps_lat:real@20",
+    "gps_lon:real@20",
+    "gps_alt:real@20",
+    "baro_alt:real@5",
+]
+outputs = [
+    "est_lat:real",
+    "est_lon:real",
+    "est_alt:real",
+    "est_heading:real",
+]
+
+[nodes.clock]
+base-period-ms = 5
+
+# --- Target platform ---
+# ARM Cortex-M7 (e.g. STM32H743) with hardware FPU.
+# Certified to DO-178C Level A (catastrophic failure condition).
+[target]
+platform = "arm-cortex-m"
+safety-standard = "DO-178C"
+
+# --- Timing constraints ---
+# 5ms period => 5000us deadline.
+# WCET analysis enabled: the generator will produce a static estimate
+# and flag any node that risks exceeding the deadline.
+[timing]
+deadline-us = 5000
+wcet-analysis = true

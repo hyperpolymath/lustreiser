@@ -2,11 +2,18 @@
 // Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 //
 // lustreiser CLI — Generate verified real-time embedded code via Lustre
+//
+// Lustre (Caspi, Halbwachs — Grenoble) is a synchronous dataflow language
+// for safety-critical systems (avionics/SCADE, nuclear, automotive).
+// lustreiser takes control logic descriptions and generates deterministic,
+// bounded-time C code via Lustre intermediate representation.
+//
 // Part of the hyperpolymath -iser family. See README.adoc for architecture.
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 
+mod abi;
 mod codegen;
 mod manifest;
 
@@ -31,7 +38,7 @@ enum Commands {
         #[arg(short, long, default_value = "lustreiser.toml")]
         manifest: String,
     },
-    /// Generate Lustre wrapper, Zig FFI bridge, and C headers from the manifest.
+    /// Generate Lustre (.lus) and C code from the manifest.
     Generate {
         #[arg(short, long, default_value = "lustreiser.toml")]
         manifest: String,
@@ -45,7 +52,7 @@ enum Commands {
         #[arg(long)]
         release: bool,
     },
-    /// Run the lustreiserd workload.
+    /// Run the generated workload.
     Run {
         #[arg(short, long, default_value = "lustreiser.toml")]
         manifest: String,
@@ -69,7 +76,7 @@ fn main() -> Result<()> {
         Commands::Validate { manifest } => {
             let m = manifest::load_manifest(&manifest)?;
             manifest::validate(&m)?;
-            println!("Manifest valid: {}", m.workload.name);
+            println!("Manifest valid: {}", m.project.name);
         }
         Commands::Generate { manifest, output } => {
             let m = manifest::load_manifest(&manifest)?;

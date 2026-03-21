@@ -1,0 +1,47 @@
+= Flight Controller Example
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+A simplified fixed-wing aircraft flight controller demonstrating lustreiser's
+core capabilities:
+
+* **Multi-node decomposition**: attitude control + navigation filter
+* **Multi-rate signals**: GPS at 10Hz vs IMU at 200Hz (clock calculus)
+* **DO-178C compliance**: avionics safety standard with WCET analysis
+* **Deterministic C output**: suitable for ARM Cortex-M bare-metal
+
+== Running
+
+[source,bash]
+----
+# Validate the manifest
+lustreiser validate -m examples/flight-controller/lustreiser.toml
+
+# Generate Lustre and C code
+lustreiser generate -m examples/flight-controller/lustreiser.toml \
+    -o generated/flight-controller
+
+# Inspect generated files
+ls generated/flight-controller/
+# attitude_ctrl.lus  attitude_ctrl.h  attitude_ctrl.c
+# nav_filter.lus     nav_filter.h     nav_filter.c
+# wcet_report.txt
+----
+
+== Architecture
+
+----
+ IMU (200Hz)          GPS (10Hz)       Barometer (40Hz)
+   |                    |                   |
+   v                    v                   v
++------------------+  +---------------------+
+| attitude_ctrl    |  | nav_filter          |
+| (5ms period)     |  | (5ms period,        |
+|                  |  |  multi-rate inputs)  |
+| pitch_err -----> elevator_cmd  |          |
+| roll_err  -----> aileron_cmd   |          |
+| yaw_err   -----> rudder_cmd    |          |
++------------------+  +---------------------+
+                         |
+                    est_lat, est_lon,
+                    est_alt, est_heading
+----
