@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
-# AGENTIC.a2ml — AI agent constraints and capabilities
+# AGENTIC.a2ml — AI agent constraints and capabilities for lustreiser
 # Defines what AI agents can and cannot do in this repository.
 
 [metadata]
 version = "0.1.0"
-last-updated = "{{CURRENT_DATE}}"
+last-updated = "2026-03-21"
 
 [agent-permissions]
 can-edit-source = true
@@ -22,6 +22,17 @@ can-create-files = true
 # - Never use banned languages (TypeScript, Python, Go, etc.)
 # - Never place state files in repository root (must be in .machine_readable/)
 # - Never use AGPL license (use PMPL-1.0-or-later)
+# - Never generate C code with malloc, recursion, or unbounded loops
+# - Never weaken WCET proofs or skip timing verification
+# - Never generate Lustre code with ambiguous clock assignments
+
+[lustre-specific-constraints]
+# Generated C output must be deterministic and certifiable:
+# - No dynamic memory allocation (malloc/calloc/realloc)
+# - No recursion (bounded call depth only)
+# - No unbounded loops (iteration counts known at compile time)
+# - All stream buffers statically allocated
+# - WCET must be proven less than clock period for every node
 
 [maintenance-integrity]
 fail-closed = true

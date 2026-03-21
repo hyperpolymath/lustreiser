@@ -1,19 +1,28 @@
-# ⚠️ STOP - CRITICAL READING REQUIRED
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+# STOP — CRITICAL READING REQUIRED
 
 **THIS FILE MUST BE READ FIRST BY ALL AI AGENTS**
 
 ## WHAT IS THIS?
 
-This is the AI manifest for **[YOUR-REPO-NAME]**. It declares:
+This is the AI manifest for **lustreiser**. It declares:
 - Canonical file locations (where things MUST be, and nowhere else)
 - Critical invariants (rules that must NEVER be violated)
 - Repository structure and organization
+
+Lustreiser generates formally verified real-time embedded code via Lustre, the
+synchronous dataflow language used in avionics (SCADE), nuclear reactor
+protection, and automotive safety systems. It analyses control logic, extracts
+dataflow patterns, generates Lustre nodes with clock calculus, and compiles to
+deterministic C for embedded targets — with Idris2-proven timing bounds.
 
 ## CANONICAL LOCATIONS (UNIVERSAL RULE)
 
 ### Machine-Readable Metadata: `.machine_readable/` ONLY
 
-These 6 a2ml files MUST exist in `.machine_readable/` directory ONLY:
+These 6 a2ml files MUST exist in `.machine_readable/6a2/` directory ONLY:
 1. **STATE.a2ml** - Project state, progress, blockers
 2. **META.a2ml** - Architecture decisions, governance
 3. **ECOSYSTEM.a2ml** - Position in ecosystem, relationships
@@ -55,7 +64,7 @@ Policy enforcement contracts (k9, dust, lust, must, trust).
 ### AI Configuration & Guides: `.machine_readable/ai/` ONLY
 
 - `AI.a2ml` - Language-specific or LLM-specific patterns
-- `PLACEHOLDERS.md` - Bootstrap guide
+- `PLACEHOLDERS.adoc` - Bootstrap guide
 
 ### Community & Forge Metadata: `.github/` ONLY
 
@@ -70,6 +79,34 @@ Policy enforcement contracts (k9, dust, lust, must, trust).
 
 - `0-AI-MANIFEST.a2ml` - THIS FILE (universal entry point)
 
+## DOMAIN CONTEXT
+
+### Lustre Language Background
+
+Lustre is a **synchronous dataflow language** for safety-critical real-time systems.
+
+Key concepts:
+- **Nodes**: Functions that transform streams of values at each clock tick
+- **Streams**: Infinite sequences of typed values, one per clock tick
+- **Temporal operators**: `pre` (previous value), `fby` (followed-by), `->` (initialisation)
+- **Clock calculus**: `when` (downsample), `merge` (recombine) — type-level sampling rates
+- **Synchronous hypothesis**: All computations complete before the next tick
+
+### Safety Standards
+
+Generated code must be suitable for certification under:
+- **DO-178C** — Software for airborne systems (avionics)
+- **IEC 61508** — Functional safety of electrical/electronic systems (industrial/nuclear)
+- **ISO 26262** — Functional safety of road vehicles (automotive)
+
+### Architecture
+
+```
+lustreiser.toml → Rust CLI → Control Flow Analysis → Idris2 ABI (timing proofs)
+    → Lustre Codegen (.lus) → Deterministic C (no malloc, no recursion)
+    → Zig FFI Bridge
+```
+
 ## CORE INVARIANTS
 
 1. **No state file duplication** - Root must NOT contain STATE.a2ml, META.a2ml, etc.
@@ -80,42 +117,58 @@ Policy enforcement contracts (k9, dust, lust, must, trust).
 6. **Container images** - MUST use Chainguard base (`cgr.dev/chainguard/wolfi-base:latest` or `cgr.dev/chainguard/static:latest`)
 7. **Container runtime** - Podman, never Docker. Files are `Containerfile`, never `Dockerfile`
 8. **Container orchestration** - `selur-compose`, never `docker-compose`
+9. **Deterministic C output** - Generated C must never use malloc, recursion, or unbounded loops
+10. **Timing proofs required** - Every generated node must have an Idris2-verified WCET bound
 
 ## REPOSITORY STRUCTURE
 
 This repo follows the **Dual-Track** architecture:
 
 ```
-[YOUR-REPO-NAME]/
+lustreiser/
 ├── 0-AI-MANIFEST.a2ml         # THIS FILE (start here)
 ├── README.adoc                 # High-level orientation (Rich Human)
-├── ROADMAP.adoc                # Future direction
+├── ROADMAP.adoc                # Phased development plan
 ├── CONTRIBUTING.adoc           # Human contribution guide
-├── GOVERNANCE.adoc             # Decision-making model
 ├── Justfile                    # Task runner
 ├── Containerfile               # OCI build
-├── LICENSE                     # Primary license
+├── Cargo.toml                  # Rust dependencies
+├── LICENSE                     # PMPL-1.0-or-later
 ├── src/                        # Source code
+│   ├── main.rs                 # CLI entry point
+│   ├── lib.rs                  # Library API
+│   ├── manifest/               # lustreiser.toml parser
+│   ├── codegen/                # Lustre node generation
+│   ├── abi/                    # Rust-side ABI types
 │   └── interface/              # Verified Interface Seams
-│       ├── abi/                # Idris2 ABI (The Spec)
-│       ├── ffi/                # Zig FFI (The Bridge)
-│       └── generated/          # C Headers (The Result)
+│       ├── abi/                # Idris2 ABI (timing proofs, clock calculus)
+│       │   ├── Types.idr       # LustreNode, Clock, DataflowStream, WCET
+│       │   ├── Layout.idr      # Stream buffer memory layout proofs
+│       │   └── Foreign.idr     # Lustre compilation FFI declarations
+│       ├── ffi/                # Zig FFI (C-ABI bridge)
+│       │   ├── build.zig
+│       │   ├── src/main.zig    # Lustre compilation and timing FFI
+│       │   └── test/           # Integration tests
+│       └── generated/          # Auto-generated C headers
 ├── container/                  # Stapeln container ecosystem
-├── docs/                       # Technical depths
-│   ├── attribution/            # Citations, owners, maintainers (adoc)
-│   ├── architecture/           # Topology, diagrams
-│   ├── theory/                 # Domain theory
-│   └── practice/               # Manuals
-├── docs/legal/                  # Legal exhibits and full texts
+├── docs/                       # Technical documentation
+│   ├── architecture/           # Topology, dataflow diagrams
+│   └── theory/                 # Lustre semantics, clock calculus
 └── .machine_readable/          # ALL machine-readable metadata
+    └── 6a2/                    # STATE, META, ECOSYSTEM, etc.
 ```
 
 ## SESSION STARTUP CHECKLIST
 
-✅ Read THIS file (0-AI-MANIFEST.a2ml) first
-✅ Understand canonical location: `.machine_readable/`
-✅ State understanding of canonical locations
+1. Read THIS file (0-AI-MANIFEST.a2ml) first
+2. Understand canonical location: `.machine_readable/`
+3. State understanding of canonical locations
+4. Read `.machine_readable/6a2/STATE.a2ml` for current project state
 
 ## ATTESTATION PROOF
 
-**"I have read the AI manifest. All machine-readable content (state files, anchors, policies, bot directives, contractiles, AI guides) is located in `.machine_readable/` ONLY, and community metadata is in `.github/`. I will not create duplicate files in the root directory."**
+**"I have read the AI manifest for lustreiser. All machine-readable content
+(state files, anchors, policies, bot directives, contractiles, AI guides) is
+located in `.machine_readable/` ONLY, and community metadata is in `.github/`.
+I will not create duplicate files in the root directory. I understand that
+generated C code must be deterministic and that timing proofs are mandatory."**

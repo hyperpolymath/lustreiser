@@ -1,23 +1,27 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
-# NEUROSYM.a2ml — Neurosymbolic integration metadata
+# NEUROSYM.a2ml — Neurosymbolic integration metadata for lustreiser
 # Configuration for Hypatia scanning and symbolic reasoning.
 
 [metadata]
 version = "0.1.0"
-last-updated = "{{CURRENT_DATE}}"
+last-updated = "2026-03-21"
 
 [hypatia-config]
 scan-enabled = true
-scan-depth = "standard"  # quick | standard | deep
+scan-depth = "deep"  # Deep scanning for safety-critical code
 report-format = "logtalk"
 
 [symbolic-rules]
-# Custom symbolic rules for this project
+# Custom symbolic rules for lustreiser safety invariants:
 # - { name = "no-unsafe-ffi", pattern = "believe_me|unsafeCoerce", severity = "critical" }
+# - { name = "no-malloc-in-generated-c", pattern = "malloc|calloc|realloc", severity = "critical" }
+# - { name = "no-recursion-in-generated-c", pattern = "recursive", severity = "critical" }
+# - { name = "wcet-proof-required", pattern = "MeetsDeadline", severity = "warning" }
+# - { name = "clock-consistency", pattern = "ClockError", severity = "critical" }
 
 [neural-config]
-# Neural pattern detection settings
-# confidence-threshold = 0.85
+# Neural pattern detection for dataflow analysis
+# confidence-threshold = 0.95  # Higher threshold for safety-critical domain
 # model = "hypatia-v2"

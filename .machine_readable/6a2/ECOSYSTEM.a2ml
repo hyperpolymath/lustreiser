@@ -6,13 +6,27 @@
   (version "0.1.0")
   (name "lustreiser")
   (type "tool")
-  (purpose "Generate formally verified real-time embedded code via Lustre")
+  (purpose "Generate formally verified real-time embedded code via Lustre synchronous dataflow")
 
   (position-in-ecosystem
     (family "-iser acceleration frameworks")
     (meta-framework "iseriser")
     (relationship "sibling")
+    (domain "safety-critical real-time embedded systems")
     (top-3 ("typedqliser" "chapeliser" "verisimiser")))
+
+  (target-domain
+    (primary "Avionics flight control (DO-178C)")
+    (secondary "Nuclear reactor protection (IEC 61508)")
+    (tertiary "Automotive powertrain (ISO 26262)")
+    (additional "PLC programming, sensor fusion, robotic actuator control"))
+
+  (lustre-ecosystem
+    (language "Lustre — Caspi, Pilaud, Halbwachs, Plaice (Grenoble, 1987)")
+    (industrial-tool "SCADE Suite (Ansys/Esterel Technologies)")
+    (model-checker "Kind2 (University of Iowa)")
+    (reference-compiler "Lv6 / Lustre V6")
+    (related-language "Esterel — synchronous reactive (events, not dataflow)"))
 
   (related-projects
     (project "iseriser"
@@ -32,7 +46,7 @@
       (description "Database recovery via constraint propagation"))
     (project "proven"
       (relationship "dependency")
-      (description "Shared Idris2 verified library"))
+      (description "Shared Idris2 verified library — timing proofs reuse proven primitives"))
     (project "typell"
       (relationship "dependency")
-      (description "Type theory engine"))))
+      (description "Type theory engine — used for clock calculus type checking"))))

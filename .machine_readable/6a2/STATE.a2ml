@@ -5,31 +5,37 @@
 (state
   (metadata
     (version "0.1.0")
-    (last-updated "2026-03-20")
+    (last-updated "2026-03-21")
     (author "Jonathan D.A. Jewell"))
 
   (project-context
     (name "lustreiser")
-    (description "Generate formally verified real-time embedded code via Lustre")
-    (status "scaffold")
+    (description "Generate formally verified real-time embedded code via Lustre synchronous dataflow")
+    (status "scaffold-documented")
     (priority "—")
-    (ecosystem "-iser family (https://github.com/hyperpolymath/iseriser)"))
+    (ecosystem "-iser family (https://github.com/hyperpolymath/iseriser)")
+    (domain "Safety-critical real-time embedded systems (avionics, nuclear, automotive)")
+    (target-standards "DO-178C, IEC 61508, ISO 26262"))
 
   (current-position
-    (phase "initial-scaffold")
-    (completion-percentage 5)
-    (milestone "Architecture defined, CLI scaffolded, RSR template complete"))
+    (phase "scaffold-with-bespoke-docs")
+    (completion-percentage 10)
+    (milestone "Architecture defined, CLI scaffolded, RSR template complete, bespoke Idris2 ABI types defined"))
 
   (route-to-mvp
-    (step 1 "Replace codegen stubs with target-language-specific generation")
-    (step 2 "Implement Idris2 ABI proofs for core invariants")
-    (step 3 "Build Zig FFI bridge")
-    (step 4 "Integration tests with real-world examples")
-    (step 5 "Documentation and examples"))
+    (step 1 "Implement control flow analysis — parse manifest to extract dataflow topology")
+    (step 2 "Implement Lustre node generation — produce .lus files with clock annotations")
+    (step 3 "Implement clock calculus — when/merge operators, clock consistency checking")
+    (step 4 "Implement WCET analysis — timing bounds for generated C code paths")
+    (step 5 "Write Idris2 proofs for timing bounds (WCET < clock period)")
+    (step 6 "Implement Lustre-to-C compilation backend (no malloc, no recursion)")
+    (step 7 "Integration tests with real embedded targets (ARM Cortex-M, RISC-V)")
+    (step 8 "First working end-to-end example (simple flight controller node)"))
 
   (blockers-and-issues
     (none "Project is in scaffold phase — no blockers yet"))
 
   (critical-next-actions
-    (action "Implement codegen for primary use case")
-    (action "Write first working example end-to-end")))
+    (action "Implement control flow analysis from lustreiser.toml manifest")
+    (action "Generate first .lus file from a simple dataflow specification")
+    (action "Define Lustre-specific manifest schema (nodes, clocks, streams, timing)")))

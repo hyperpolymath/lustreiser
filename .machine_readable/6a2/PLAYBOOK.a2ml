@@ -1,29 +1,37 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
-# PLAYBOOK.a2ml — Operational playbook
+# PLAYBOOK.a2ml — Operational playbook for lustreiser
 # Runbooks, incident response, deployment procedures.
 
 [metadata]
 version = "0.1.0"
-last-updated = "{{CURRENT_DATE}}"
+last-updated = "2026-03-21"
 
 [deployment]
-# method = "gitops"  # gitops | manual | ci-triggered
-# target = "container"  # container | binary | library | wasm
+method = "binary"  # CLI binary distributed via cargo install or container
+target = "binary"  # Primary output is a CLI tool; secondary output is generated C code
+
+[embedded-target-deployment]
+# Generated C code deployment to embedded targets:
+# 1. Run `lustreiser generate` to produce .lus and .c files
+# 2. Cross-compile C output for target architecture (ARM Cortex-M, RISC-V)
+# 3. Flash to embedded target
+# 4. Verify timing on hardware matches WCET analysis
 
 [incident-response]
-# 1. Check .machine_readable/STATE.a2ml for current status
+# 1. Check .machine_readable/6a2/STATE.a2ml for current status
 # 2. Review recent commits and CI results
-# 3. Run `just validate` to check compliance
+# 3. Run `just validate` to check RSR compliance
 # 4. Run `just security` to audit for vulnerabilities
+# 5. For timing-related issues: re-run WCET analysis with updated code paths
 
 [release-process]
-# 1. Update version in STATE.a2ml, META.a2ml, Justfile
+# 1. Update version in STATE.a2ml, META.a2ml, Cargo.toml, main.zig
 # 2. Run `just release-preflight` (validate + quality + security + maint-hard-pass)
-# 3. Optional local permission hardening: `just perms-snapshot && just perms-lock`
-# 4. Tag and push
-# 5. Restore local permissions if needed: `just perms-restore`
+# 3. Verify all Idris2 timing proofs compile without holes
+# 4. Run integration tests against Zig FFI
+# 5. Tag and push
 # 6. Run `just container-push` if applicable
 
 [maintenance-operations]
@@ -33,3 +41,5 @@ last-updated = "{{CURRENT_DATE}}"
 #   just maint-hard-pass
 # Permission audit:
 #   just perms-audit
+# Timing proof verification:
+#   cd src/interface/abi && idris2 --check Types.idr Layout.idr Foreign.idr

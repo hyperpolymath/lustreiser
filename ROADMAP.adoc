@@ -1,32 +1,72 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-= lustreiser Roadmap
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Lustreiser Roadmap
 :toc:
 :icons: font
 
 == Phase 0: Scaffold (COMPLETE)
-* [x] RSR template with full CI/CD
-* [x] CLI with subcommands
-* [x] Manifest parser
+* [x] RSR template with full CI/CD (17 workflows)
+* [x] CLI with subcommands (init, validate, generate, build, run, info)
+* [x] Manifest parser (`lustreiser.toml`)
 * [x] Codegen stubs
-* [x] ABI module stubs
-* [x] README with architecture
+* [x] Idris2 ABI module stubs
+* [x] Zig FFI bridge stubs
+* [x] README with Lustre-specific architecture
 
-== Phase 1: Core Implementation
-* [ ] Implement target-language-specific code generation
-* [ ] Write Idris2 ABI proofs for core invariants
-* [ ] Build Zig FFI bridge
-* [ ] First working end-to-end example
-* [ ] Integration tests
+== Phase 1: Control Flow Analysis
+* [ ] Parse manifest to extract dataflow topology
+* [ ] Build directed acyclic graph (DAG) of node dependencies
+* [ ] Identify input/output streams and their types
+* [ ] Detect feedback loops requiring `pre`/`fby` operators
+* [ ] Validate that the dataflow graph is acyclic (modulo `pre`)
+* [ ] Extract timing requirements from manifest declarations
+* [ ] Map user-declared I/O to Lustre node ports
 
-== Phase 2: Polish
-* [ ] Error messages and diagnostics
-* [ ] Shell completions (bash, zsh, fish)
-* [ ] CI/CD for the generated artifacts
-* [ ] Performance benchmarks
-* [ ] Additional examples
+== Phase 2: Lustre Node Generation
+* [ ] Generate `.lus` files from the analysed dataflow graph
+* [ ] Emit correct `node` declarations with typed input/output streams
+* [ ] Insert `pre` and `fby` temporal operators for stateful streams
+* [ ] Generate `->` (followed-by) for stream initialisation
+* [ ] Produce combinational nodes (no state) for pure transformations
+* [ ] Support nested node instantiation (hierarchical composition)
+* [ ] Generate assertion nodes for runtime monitoring (`assert`)
 
-== Phase 3: Ecosystem
-* [ ] PanLL panel integration
-* [ ] BoJ-server cartridge
-* [ ] VeriSimDB backing store for results
+== Phase 3: Clock Calculus
+* [ ] Assign base clock to top-level nodes
+* [ ] Implement `when` operator for clock downsampling
+* [ ] Implement `merge` operator for clock recombination
+* [ ] Type-check clock expressions (every stream has exactly one clock)
+* [ ] Support multi-rate systems (sensors at different frequencies)
+* [ ] Generate clock annotations in Lustre output
+* [ ] Verify clock consistency across node boundaries
+
+== Phase 4: WCET Analysis and Timing Proofs
+* [ ] Integrate worst-case execution time (WCET) analysis
+* [ ] Model generated C code paths for timing bounds
+* [ ] Prove in Idris2 that WCET fits within declared clock period
+* [ ] Detect unbounded constructs (recursion, dynamic allocation) and reject them
+* [ ] Generate timing certificates for each node
+* [ ] Support multiple clock domains with independent WCET budgets
+* [ ] Produce machine-readable timing reports (for DO-178C evidence)
+
+== Phase 5: Idris2 Timing Proofs (ABI Layer)
+* [ ] Define `LustreNode` type with timing metadata
+* [ ] Define `Clock` type with period and phase
+* [ ] Define `DataflowStream` with element type and clock
+* [ ] Define `TemporalOperator` (Pre, Fby, When, Merge) with clock proofs
+* [ ] Define `WCET` bounded-time type with formal deadline proofs
+* [ ] Prove that node composition preserves timing bounds
+* [ ] Prove that clock calculus transformations are sound
+* [ ] Prove stream buffer layouts fit in static memory
+* [ ] Generate C headers from verified ABI definitions
+
+== Phase 6: Ecosystem Integration
+* [ ] SCADE interop — import/export `.lus` files compatible with SCADE Suite
+* [ ] Kind2 model checker integration for property verification
+* [ ] Lv6 compiler backend for reference compilation
+* [ ] PanLL panel for interactive dataflow visualisation
+* [ ] BoJ-server cartridge for Lustre generation as a service
+* [ ] VeriSimDB backing store for timing analysis results
+* [ ] Integration tests with real embedded targets (ARM Cortex-M, RISC-V)
+* [ ] Examples: flight controller, PID loop, watchdog timer, sensor fusion
 * [ ] Publish to crates.io

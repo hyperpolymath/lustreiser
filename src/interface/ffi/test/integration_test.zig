@@ -1,89 +1,174 @@
-// {{PROJECT}} Integration Tests
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// Lustreiser Integration Tests
 //
 // These tests verify that the Zig FFI correctly implements the Idris2 ABI
+// declared in src/interface/abi/Foreign.idr. Each test exercises a specific
+// FFI function and checks that return values, error codes, and state
+// transitions match the formal ABI specification.
+//
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
 const std = @import("std");
 const testing = std.testing;
 
-// Import FFI functions
-extern fn {{project}}_init() ?*opaque {};
-extern fn {{project}}_free(?*opaque {}) void;
-extern fn {{project}}_process(?*opaque {}, u32) c_int;
-extern fn {{project}}_get_string(?*opaque {}) ?[*:0]const u8;
-extern fn {{project}}_free_string(?[*:0]const u8) void;
-extern fn {{project}}_last_error() ?[*:0]const u8;
-extern fn {{project}}_version() [*:0]const u8;
-extern fn {{project}}_is_initialized(?*opaque {}) u32;
+// Import FFI functions (linked against liblustreiser)
+extern fn lustreiser_init() ?*opaque {};
+extern fn lustreiser_free(?*opaque {}) void;
+extern fn lustreiser_compile_nodes(?*opaque {}, ?[*:0]const u8) c_int;
+extern fn lustreiser_lustre_to_c(?*opaque {}, ?[*:0]const u8, ?[*:0]const u8) c_int;
+extern fn lustreiser_analyse_wcet(?*opaque {}, ?[*:0]const u8) u32;
+extern fn lustreiser_verify_deadline(?*opaque {}, ?[*:0]const u8, u32) c_int;
+extern fn lustreiser_validate_clocks(?*opaque {}) c_int;
+extern fn lustreiser_get_clock_tree(?*opaque {}) ?[*:0]const u8;
+extern fn lustreiser_calc_memory_budget(?*opaque {}) u32;
+extern fn lustreiser_check_memory_fit(?*opaque {}, u32) c_int;
+extern fn lustreiser_get_string(?*opaque {}) ?[*:0]const u8;
+extern fn lustreiser_free_string(?[*:0]const u8) void;
+extern fn lustreiser_last_error() ?[*:0]const u8;
+extern fn lustreiser_version() [*:0]const u8;
+extern fn lustreiser_build_info() [*:0]const u8;
+extern fn lustreiser_is_initialized(?*opaque {}) u32;
 
 //==============================================================================
 // Lifecycle Tests
 //==============================================================================
 
-test "create and destroy handle" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    try testing.expect(handle != null);
+test "create and destroy context" {
+    const ctx = lustreiser_init() orelse return error.InitFailed;
+    defer lustreiser_free(ctx);
+    try testing.expect(ctx != null);
 }
 
-test "handle is initialized" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    const initialized = {{project}}_is_initialized(handle);
-    try testing.expectEqual(@as(u32, 1), initialized);
+test "context is initialised after init" {
+    const ctx = lustreiser_init() orelse return error.InitFailed;
+    defer lustreiser_free(ctx);
+    try testing.expectEqual(@as(u32, 1), lustreiser_is_initialized(ctx));
 }
 
-test "null handle is not initialized" {
-    const initialized = {{project}}_is_initialized(null);
-    try testing.expectEqual(@as(u32, 0), initialized);
+test "null context is not initialised" {
+    try testing.expectEqual(@as(u32, 0), lustreiser_is_initialized(null));
 }
 
-//==============================================================================
-// Operation Tests
-//==============================================================================
-
-test "process with valid handle" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    const result = {{project}}_process(handle, 42);
-    try testing.expectEqual(@as(c_int, 0), result); // 0 = ok
-}
-
-test "process with null handle returns error" {
-    const result = {{project}}_process(null, 42);
-    try testing.expectEqual(@as(c_int, 4), result); // 4 = null_pointer
+test "free null context is safe" {
+    lustreiser_free(null); // Must not crash
 }
 
 //==============================================================================
-// String Tests
+// Node Compilation Tests
 //==============================================================================
 
-test "get string result" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
+test "compile_nodes with null context returns null_pointer (4)" {
+    const result = lustreiser_compile_nodes(null, null);
+    try testing.expectEqual(@as(c_int, 4), result);
+}
 
-    const str = {{project}}_get_string(handle);
-    defer if (str) |s| {{project}}_free_string(s);
+test "compile_nodes with null manifest returns invalid_param (2)" {
+    const ctx = lustreiser_init() orelse return error.InitFailed;
+    defer lustreiser_free(ctx);
 
+    const result = lustreiser_compile_nodes(ctx, null);
+    try testing.expectEqual(@as(c_int, 2), result);
+}
+
+test "lustre_to_c with null context returns null_pointer (4)" {
+    const result = lustreiser_lustre_to_c(null, null, null);
+    try testing.expectEqual(@as(c_int, 4), result);
+}
+
+test "lustre_to_c with null source returns invalid_param (2)" {
+    const ctx = lustreiser_init() orelse return error.InitFailed;
+    defer lustreiser_free(ctx);
+
+    const result = lustreiser_lustre_to_c(ctx, null, "output.c");
+    try testing.expectEqual(@as(c_int, 2), result);
+}
+
+//==============================================================================
+// WCET Analysis Tests
+//==============================================================================
+
+test "analyse_wcet with null context returns 0" {
+    const wcet = lustreiser_analyse_wcet(null, null);
+    try testing.expectEqual(@as(u32, 0), wcet);
+}
+
+test "verify_deadline with null context returns null_pointer (4)" {
+    const result = lustreiser_verify_deadline(null, null, 1000);
+    try testing.expectEqual(@as(c_int, 4), result);
+}
+
+//==============================================================================
+// Clock Calculus Tests
+//==============================================================================
+
+test "validate_clocks on fresh context succeeds (0)" {
+    const ctx = lustreiser_init() orelse return error.InitFailed;
+    defer lustreiser_free(ctx);
+
+    const result = lustreiser_validate_clocks(ctx);
+    try testing.expectEqual(@as(c_int, 0), result);
+}
+
+test "validate_clocks with null context returns null_pointer (4)" {
+    const result = lustreiser_validate_clocks(null);
+    try testing.expectEqual(@as(c_int, 4), result);
+}
+
+test "get_clock_tree on fresh context returns non-null" {
+    const ctx = lustreiser_init() orelse return error.InitFailed;
+    defer lustreiser_free(ctx);
+
+    const tree = lustreiser_get_clock_tree(ctx);
+    defer if (tree) |t| lustreiser_free_string(t);
+    try testing.expect(tree != null);
+}
+
+//==============================================================================
+// Memory Budget Tests
+//==============================================================================
+
+test "fresh context has zero memory budget" {
+    const ctx = lustreiser_init() orelse return error.InitFailed;
+    defer lustreiser_free(ctx);
+
+    const budget = lustreiser_calc_memory_budget(ctx);
+    try testing.expectEqual(@as(u32, 0), budget);
+}
+
+test "zero budget fits in any RAM" {
+    const ctx = lustreiser_init() orelse return error.InitFailed;
+    defer lustreiser_free(ctx);
+
+    const result = lustreiser_check_memory_fit(ctx, 1024);
+    try testing.expectEqual(@as(c_int, 0), result); // ok
+}
+
+test "memory fit with null context returns null_pointer (4)" {
+    const result = lustreiser_check_memory_fit(null, 1024);
+    try testing.expectEqual(@as(c_int, 4), result);
+}
+
+//==============================================================================
+// String and Error Tests
+//==============================================================================
+
+test "get_string returns non-null for valid context" {
+    const ctx = lustreiser_init() orelse return error.InitFailed;
+    defer lustreiser_free(ctx);
+
+    const str = lustreiser_get_string(ctx);
+    defer if (str) |s| lustreiser_free_string(s);
     try testing.expect(str != null);
 }
 
-test "get string with null handle" {
-    const str = {{project}}_get_string(null);
+test "get_string with null context returns null" {
+    const str = lustreiser_get_string(null);
     try testing.expect(str == null);
 }
 
-//==============================================================================
-// Error Handling Tests
-//==============================================================================
-
-test "last error after null handle operation" {
-    _ = {{project}}_process(null, 0);
-
-    const err = {{project}}_last_error();
+test "last_error after null context operation" {
+    _ = lustreiser_compile_nodes(null, null);
+    const err = lustreiser_last_error();
     try testing.expect(err != null);
 
     if (err) |e| {
@@ -92,91 +177,42 @@ test "last error after null handle operation" {
     }
 }
 
-test "no error after successful operation" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    _ = {{project}}_process(handle, 0);
-
-    // Error should be cleared after successful operation
-    // (This depends on implementation)
-}
-
 //==============================================================================
 // Version Tests
 //==============================================================================
 
 test "version string is not empty" {
-    const ver = {{project}}_version();
+    const ver = lustreiser_version();
     const ver_str = std.mem.span(ver);
-
     try testing.expect(ver_str.len > 0);
 }
 
 test "version string is semantic version format" {
-    const ver = {{project}}_version();
+    const ver = lustreiser_version();
     const ver_str = std.mem.span(ver);
-
-    // Should be in format X.Y.Z
     try testing.expect(std.mem.count(u8, ver_str, ".") >= 1);
+}
+
+test "build info string is not empty" {
+    const info = lustreiser_build_info();
+    const info_str = std.mem.span(info);
+    try testing.expect(info_str.len > 0);
 }
 
 //==============================================================================
 // Memory Safety Tests
 //==============================================================================
 
-test "multiple handles are independent" {
-    const h1 = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(h1);
+test "multiple contexts are independent" {
+    const ctx1 = lustreiser_init() orelse return error.InitFailed;
+    defer lustreiser_free(ctx1);
 
-    const h2 = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(h2);
+    const ctx2 = lustreiser_init() orelse return error.InitFailed;
+    defer lustreiser_free(ctx2);
 
-    try testing.expect(h1 != h2);
+    try testing.expect(ctx1 != ctx2);
 
-    // Operations on h1 should not affect h2
-    _ = {{project}}_process(h1, 1);
-    _ = {{project}}_process(h2, 2);
-}
-
-test "double free is safe" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-
-    {{project}}_free(handle);
-    {{project}}_free(handle); // Should not crash
-}
-
-test "free null is safe" {
-    {{project}}_free(null); // Should not crash
-}
-
-//==============================================================================
-// Thread Safety Tests (if applicable)
-//==============================================================================
-
-test "concurrent operations" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    const ThreadContext = struct {
-        h: *opaque {},
-        id: u32,
-    };
-
-    const thread_fn = struct {
-        fn run(ctx: ThreadContext) void {
-            _ = {{project}}_process(ctx.h, ctx.id);
-        }
-    }.run;
-
-    var threads: [4]std.Thread = undefined;
-    for (&threads, 0..) |*thread, i| {
-        thread.* = try std.Thread.spawn(.{}, thread_fn, .{
-            ThreadContext{ .h = handle, .id = @intCast(i) },
-        });
-    }
-
-    for (threads) |thread| {
-        thread.join();
-    }
+    // Operations on ctx1 should not affect ctx2
+    _ = lustreiser_validate_clocks(ctx1);
+    _ = lustreiser_validate_clocks(ctx2);
 }
