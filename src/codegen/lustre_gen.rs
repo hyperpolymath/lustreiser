@@ -196,10 +196,7 @@ fn generate_equations(node: &ParsedNode) -> Vec<String> {
                     ));
                 }
             } else {
-                equations.push(format!(
-                    "{} = {}_prev",
-                    output.name, output.name,
-                ));
+                equations.push(format!("{} = {}_prev", output.name, output.name,));
             }
         }
     } else {
@@ -284,7 +281,10 @@ mod tests {
     #[test]
     fn test_lustre_fby_present() {
         let lus = generate_lustre_node(&simple_node());
-        assert!(lus.contains("fby"), "Expected fby operator in generated Lustre");
+        assert!(
+            lus.contains("fby"),
+            "Expected fby operator in generated Lustre"
+        );
     }
 
     #[test]
@@ -306,9 +306,18 @@ mod tests {
             is_multi_rate: true,
         };
         let lus = generate_lustre_node(&node);
-        assert!(lus.contains("when"), "Expected 'when' operator for multi-rate");
-        assert!(lus.contains("merge"), "Expected 'merge' operator for multi-rate");
-        assert!(lus.contains("slow_sampled"), "Expected sampled local for sub-rate input");
+        assert!(
+            lus.contains("when"),
+            "Expected 'when' operator for multi-rate"
+        );
+        assert!(
+            lus.contains("merge"),
+            "Expected 'merge' operator for multi-rate"
+        );
+        assert!(
+            lus.contains("slow_sampled"),
+            "Expected sampled local for sub-rate input"
+        );
     }
 
     #[test]
@@ -335,6 +344,9 @@ mod tests {
             is_multi_rate: false,
         };
         let lus = generate_lustre_node(&node);
-        assert!(lus.contains("false fby"), "Expected 'false fby' for bool init");
+        assert!(
+            lus.contains("false fby"),
+            "Expected 'false fby' for bool init"
+        );
     }
 }

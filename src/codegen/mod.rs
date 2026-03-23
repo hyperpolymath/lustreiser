@@ -33,8 +33,7 @@ pub fn generate_all(manifest: &Manifest, output_dir: &str) -> Result<()> {
     fs::create_dir_all(out).context("Failed to create output directory")?;
 
     // Stage 1: Parse and validate node definitions from the manifest.
-    let parsed_nodes = parser::parse_nodes(manifest)
-        .context("Failed to parse node definitions")?;
+    let parsed_nodes = parser::parse_nodes(manifest).context("Failed to parse node definitions")?;
 
     // Stage 2: Generate Lustre (.lus) files.
     for node in &parsed_nodes {
@@ -69,10 +68,7 @@ pub fn generate_all(manifest: &Manifest, output_dir: &str) -> Result<()> {
 /// Generate a WCET analysis report for all nodes.
 /// This is a static estimation based on node complexity; a real tool chain
 /// would integrate with aiT, Bound-T, or OTAWA for precise analysis.
-fn generate_wcet_report(
-    nodes: &[parser::ParsedNode],
-    manifest: &Manifest,
-) -> String {
+fn generate_wcet_report(nodes: &[parser::ParsedNode], manifest: &Manifest) -> String {
     use crate::abi::{SafetyStandard, Wcet};
 
     let standard: SafetyStandard = manifest
@@ -91,10 +87,7 @@ fn generate_wcet_report(
         "Target: {} ({})\n",
         manifest.target.platform, manifest.target.safety_standard
     ));
-    report.push_str(&format!(
-        "Deadline: {}us\n\n",
-        manifest.timing.deadline_us
-    ));
+    report.push_str(&format!("Deadline: {}us\n\n", manifest.timing.deadline_us));
 
     let mut all_pass = true;
     for node in nodes {
@@ -108,12 +101,7 @@ fn generate_wcet_report(
             + (node.outputs.len() as u64 * 15)
             + (node.operator_count as u64 * 20);
 
-        let wcet = Wcet::new(
-            &node.name,
-            estimated_us,
-            manifest.timing.deadline_us,
-            true,
-        );
+        let wcet = Wcet::new(&node.name, estimated_us, manifest.timing.deadline_us, true);
 
         let compliant = wcet.satisfies_standard(&standard);
         if !compliant {
@@ -124,7 +112,11 @@ fn generate_wcet_report(
         report.push_str(&format!(
             "  {} compliant: {}\n\n",
             standard.display_name(),
-            if compliant { "YES" } else { "NO — margin insufficient" }
+            if compliant {
+                "YES"
+            } else {
+                "NO — margin insufficient"
+            }
         ));
     }
 

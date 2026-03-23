@@ -285,7 +285,11 @@ fn test_abi_types_round_trip() {
     node.add_operator(TemporalOperator::Pre);
 
     let errors = node.validate();
-    assert!(errors.is_empty(), "Unexpected validation errors: {:?}", errors);
+    assert!(
+        errors.is_empty(),
+        "Unexpected validation errors: {:?}",
+        errors
+    );
 
     // Display format.
     let display = format!("{}", node);
@@ -356,11 +360,17 @@ wcet-analysis = true
     assert!(lus.contains("@/20"), "GPS should be annotated as rate /20");
     assert!(lus.contains("@/5"), "Baro should be annotated as rate /5");
     assert!(lus.contains("when"), "Multi-rate requires 'when' operator");
-    assert!(lus.contains("merge"), "Multi-rate requires 'merge' operator");
+    assert!(
+        lus.contains("merge"),
+        "Multi-rate requires 'merge' operator"
+    );
 
     // The C file should have tick-based rate division.
     let c_source = fs::read_to_string(output_dir.join("fusion.c")).unwrap();
-    assert!(c_source.contains("tick_count"), "Multi-rate C needs tick counter");
+    assert!(
+        c_source.contains("tick_count"),
+        "Multi-rate C needs tick counter"
+    );
     assert!(c_source.contains("% 20"), "GPS rate division by 20");
 
     // The header should have the tick counter in the state struct.
@@ -436,6 +446,9 @@ wcet-analysis = false
 
     // Verify float type mapping.
     let header = fs::read_to_string(output_dir.join("echo.h")).unwrap();
-    assert!(header.contains("float in_val"), "float signal should map to C float");
+    assert!(
+        header.contains("float in_val"),
+        "float signal should map to C float"
+    );
     assert!(header.contains("float out_val"));
 }

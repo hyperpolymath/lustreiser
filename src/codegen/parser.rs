@@ -51,8 +51,7 @@ pub fn parse_nodes(manifest: &Manifest) -> Result<Vec<ParsedNode>> {
     let mut parsed = Vec::with_capacity(manifest.nodes.len());
     for (i, node_cfg) in manifest.nodes.iter().enumerate() {
         let ctx = format!("nodes[{}] ('{}')", i, node_cfg.name);
-        let pn = parse_single_node(node_cfg)
-            .with_context(|| format!("Failed to parse {}", ctx))?;
+        let pn = parse_single_node(node_cfg).with_context(|| format!("Failed to parse {}", ctx))?;
         parsed.push(pn);
     }
     Ok(parsed)
@@ -162,10 +161,7 @@ mod tests {
 
     #[test]
     fn test_parse_multi_rate_node() {
-        let m = minimal_manifest(
-            vec!["fast:real", "slow:real@10"],
-            vec!["out:real"],
-        );
+        let m = minimal_manifest(vec!["fast:real", "slow:real@10"], vec!["out:real"]);
         let nodes = parse_nodes(&m).unwrap();
         assert!(nodes[0].is_multi_rate);
         assert_eq!(nodes[0].inputs[1].rate, 10);

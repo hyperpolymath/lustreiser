@@ -47,7 +47,12 @@ impl Clock {
 
 impl fmt::Display for Clock {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}ms ({:.1}Hz)", self.base_period_ms, self.frequency_hz())
+        write!(
+            f,
+            "{}ms ({:.1}Hz)",
+            self.base_period_ms,
+            self.frequency_hz()
+        )
     }
 }
 
@@ -152,7 +157,10 @@ impl std::str::FromStr for SignalType {
             "int" | "int32" | "integer" => Ok(Self::Int),
             "float" | "f32" => Ok(Self::Float),
             "real" | "double" | "f64" => Ok(Self::Real),
-            other => Err(format!("Unknown signal type: '{}'. Expected bool, int, float, or real.", other)),
+            other => Err(format!(
+                "Unknown signal type: '{}'. Expected bool, int, float, or real.",
+                other
+            )),
         }
     }
 }
@@ -261,8 +269,16 @@ impl LustreNode {
             errors.push("Node name must not be empty".to_string());
         }
 
-        if !self.name.chars().next().map_or(false, |c| c.is_ascii_alphabetic() || c == '_') {
-            errors.push(format!("Node name '{}' must start with a letter or underscore", self.name));
+        if !self
+            .name
+            .chars()
+            .next()
+            .is_some_and(|c| c.is_ascii_alphabetic() || c == '_')
+        {
+            errors.push(format!(
+                "Node name '{}' must start with a letter or underscore",
+                self.name
+            ));
         }
 
         if self.inputs.is_empty() {
@@ -270,14 +286,20 @@ impl LustreNode {
         }
 
         if self.outputs.is_empty() {
-            errors.push(format!("Node '{}' must have at least one output", self.name));
+            errors.push(format!(
+                "Node '{}' must have at least one output",
+                self.name
+            ));
         }
 
         // Check for duplicate signal names across inputs and outputs.
         let mut seen = std::collections::HashSet::new();
         for sig in self.inputs.iter().chain(self.outputs.iter()) {
             if !seen.insert(&sig.name) {
-                errors.push(format!("Duplicate signal name '{}' in node '{}'", sig.name, self.name));
+                errors.push(format!(
+                    "Duplicate signal name '{}' in node '{}'",
+                    sig.name, self.name
+                ));
             }
         }
 
@@ -406,7 +428,12 @@ impl EmbeddedTarget {
     /// Return recommended compiler optimisation flags for this target.
     pub fn compiler_flags(&self) -> &'static [&'static str] {
         match self {
-            Self::ArmCortexM => &["-mcpu=cortex-m4", "-mthumb", "-mfloat-abi=hard", "-mfpu=fpv4-sp-d16"],
+            Self::ArmCortexM => &[
+                "-mcpu=cortex-m4",
+                "-mthumb",
+                "-mfloat-abi=hard",
+                "-mfpu=fpv4-sp-d16",
+            ],
             Self::RiscV => &["-march=rv32imac", "-mabi=ilp32"],
             Self::X86 => &["-march=native", "-O2"],
         }
@@ -456,7 +483,12 @@ pub struct Wcet {
 
 impl Wcet {
     /// Create a new WCET result.
-    pub fn new(node_name: impl Into<String>, estimated_us: u64, deadline_us: u64, analysis_performed: bool) -> Self {
+    pub fn new(
+        node_name: impl Into<String>,
+        estimated_us: u64,
+        deadline_us: u64,
+        analysis_performed: bool,
+    ) -> Self {
         Self {
             node_name: node_name.into(),
             estimated_us,
@@ -496,7 +528,11 @@ impl Wcet {
 
 impl fmt::Display for Wcet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let status = if self.meets_deadline() { "OK" } else { "VIOLATION" };
+        let status = if self.meets_deadline() {
+            "OK"
+        } else {
+            "VIOLATION"
+        };
         write!(
             f,
             "WCET({}) = {}us / {}us deadline [{}] (utilisation: {:.1}%)",
@@ -561,16 +597,34 @@ mod tests {
 
     #[test]
     fn test_safety_standard_parsing() {
-        assert_eq!("DO-178C".parse::<SafetyStandard>().unwrap(), SafetyStandard::Do178c);
-        assert_eq!("IEC-61508".parse::<SafetyStandard>().unwrap(), SafetyStandard::Iec61508);
-        assert_eq!("ISO-26262".parse::<SafetyStandard>().unwrap(), SafetyStandard::Iso26262);
+        assert_eq!(
+            "DO-178C".parse::<SafetyStandard>().unwrap(),
+            SafetyStandard::Do178c
+        );
+        assert_eq!(
+            "IEC-61508".parse::<SafetyStandard>().unwrap(),
+            SafetyStandard::Iec61508
+        );
+        assert_eq!(
+            "ISO-26262".parse::<SafetyStandard>().unwrap(),
+            SafetyStandard::Iso26262
+        );
     }
 
     #[test]
     fn test_embedded_target_parsing() {
-        assert_eq!("arm-cortex-m".parse::<EmbeddedTarget>().unwrap(), EmbeddedTarget::ArmCortexM);
-        assert_eq!("riscv".parse::<EmbeddedTarget>().unwrap(), EmbeddedTarget::RiscV);
-        assert_eq!("x86".parse::<EmbeddedTarget>().unwrap(), EmbeddedTarget::X86);
+        assert_eq!(
+            "arm-cortex-m".parse::<EmbeddedTarget>().unwrap(),
+            EmbeddedTarget::ArmCortexM
+        );
+        assert_eq!(
+            "riscv".parse::<EmbeddedTarget>().unwrap(),
+            EmbeddedTarget::RiscV
+        );
+        assert_eq!(
+            "x86".parse::<EmbeddedTarget>().unwrap(),
+            EmbeddedTarget::X86
+        );
     }
 
     #[test]
@@ -589,9 +643,9 @@ mod tests {
     fn test_wcet_safety_standard_compliance() {
         // 70% utilisation => 30% margin => passes all standards
         let w = Wcet::new("ctrl", 700, 1000, true);
-        assert!(w.satisfies_standard(&SafetyStandard::Iso26262));  // needs 20%
-        assert!(w.satisfies_standard(&SafetyStandard::Iec61508));  // needs 15%
-        assert!(w.satisfies_standard(&SafetyStandard::Do178c));    // needs 10%
+        assert!(w.satisfies_standard(&SafetyStandard::Iso26262)); // needs 20%
+        assert!(w.satisfies_standard(&SafetyStandard::Iec61508)); // needs 15%
+        assert!(w.satisfies_standard(&SafetyStandard::Do178c)); // needs 10%
 
         // 95% utilisation => 5% margin => fails all
         let w_tight = Wcet::new("ctrl", 950, 1000, true);
@@ -604,15 +658,30 @@ mod tests {
     fn test_temporal_operator_display() {
         assert_eq!(format!("{}", TemporalOperator::Pre), "pre");
         assert_eq!(
-            format!("{}", TemporalOperator::Fby { init_expr: "0".to_string() }),
+            format!(
+                "{}",
+                TemporalOperator::Fby {
+                    init_expr: "0".to_string()
+                }
+            ),
             "0 fby"
         );
         assert_eq!(
-            format!("{}", TemporalOperator::When { clock_signal: "clk_10hz".to_string() }),
+            format!(
+                "{}",
+                TemporalOperator::When {
+                    clock_signal: "clk_10hz".to_string()
+                }
+            ),
             "when clk_10hz"
         );
         assert_eq!(
-            format!("{}", TemporalOperator::Merge { clock_signal: "sel".to_string() }),
+            format!(
+                "{}",
+                TemporalOperator::Merge {
+                    clock_signal: "sel".to_string()
+                }
+            ),
             "merge(sel)"
         );
     }

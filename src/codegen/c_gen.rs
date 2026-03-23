@@ -70,7 +70,7 @@ fn generate_header(node: &ParsedNode, manifest: &Manifest) -> String {
         node.clock.base_period_ms,
         node.clock.frequency_hz(),
     ));
-    buf.push_str(&format!("typedef struct {{\n"));
+    buf.push_str("typedef struct {\n");
 
     // One state field per output (for fby previous value).
     for output in &node.outputs {
@@ -84,7 +84,9 @@ fn generate_header(node: &ParsedNode, manifest: &Manifest) -> String {
 
     // Tick counter for multi-rate scheduling.
     if node.is_multi_rate {
-        buf.push_str("    uint32_t tick_count;  /**< Base-clock tick counter for rate division */\n");
+        buf.push_str(
+            "    uint32_t tick_count;  /**< Base-clock tick counter for rate division */\n",
+        );
     }
 
     // Initialisation flag.
@@ -93,8 +95,11 @@ fn generate_header(node: &ParsedNode, manifest: &Manifest) -> String {
     buf.push_str(&format!("}} {}_state_t;\n\n", node.name));
 
     // Input struct.
-    buf.push_str(&format!("/**\n * Input signals for node '{}'.\n */\n", node.name));
-    buf.push_str(&format!("typedef struct {{\n"));
+    buf.push_str(&format!(
+        "/**\n * Input signals for node '{}'.\n */\n",
+        node.name
+    ));
+    buf.push_str("typedef struct {\n");
     for input in &node.inputs {
         buf.push_str(&format!(
             "    {} {};  /**< Input signal '{}' (rate: /{}) */\n",
@@ -107,8 +112,11 @@ fn generate_header(node: &ParsedNode, manifest: &Manifest) -> String {
     buf.push_str(&format!("}} {}_input_t;\n\n", node.name));
 
     // Output struct.
-    buf.push_str(&format!("/**\n * Output signals for node '{}'.\n */\n", node.name));
-    buf.push_str(&format!("typedef struct {{\n"));
+    buf.push_str(&format!(
+        "/**\n * Output signals for node '{}'.\n */\n",
+        node.name
+    ));
+    buf.push_str("typedef struct {\n");
     for output in &node.outputs {
         buf.push_str(&format!(
             "    {} {};  /**< Output signal '{}' */\n",

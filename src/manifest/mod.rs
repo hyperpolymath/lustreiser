@@ -179,10 +179,13 @@ pub struct ParsedSignal {
 pub fn parse_signal(spec: &str) -> Result<ParsedSignal> {
     let spec = spec.trim();
     let (name_type, rate) = if let Some((left, right)) = spec.rsplit_once('@') {
-        let rate: u32 = right
-            .trim()
-            .parse()
-            .with_context(|| format!("Invalid rate in signal spec '{}': '{}' is not a number", spec, right.trim()))?;
+        let rate: u32 = right.trim().parse().with_context(|| {
+            format!(
+                "Invalid rate in signal spec '{}': '{}' is not a number",
+                spec,
+                right.trim()
+            )
+        })?;
         if rate == 0 {
             anyhow::bail!("Rate must be >= 1 in signal spec '{}'", spec);
         }
@@ -191,9 +194,12 @@ pub fn parse_signal(spec: &str) -> Result<ParsedSignal> {
         (spec, 1u32)
     };
 
-    let (name, signal_type) = name_type
-        .split_once(':')
-        .with_context(|| format!("Signal spec '{}' must be 'name:type' or 'name:type@rate'", spec))?;
+    let (name, signal_type) = name_type.split_once(':').with_context(|| {
+        format!(
+            "Signal spec '{}' must be 'name:type' or 'name:type@rate'",
+            spec
+        )
+    })?;
 
     let name = name.trim().to_string();
     let signal_type = signal_type.trim().to_string();
@@ -220,8 +226,7 @@ pub fn parse_signal(spec: &str) -> Result<ParsedSignal> {
 pub fn load_manifest(path: &str) -> Result<Manifest> {
     let content = std::fs::read_to_string(path)
         .with_context(|| format!("Failed to read manifest: {}", path))?;
-    toml::from_str(&content)
-        .with_context(|| format!("Failed to parse manifest: {}", path))
+    toml::from_str(&content).with_context(|| format!("Failed to parse manifest: {}", path))
 }
 
 /// Validate a loaded manifest for correctness.
@@ -245,7 +250,9 @@ pub fn validate(manifest: &Manifest) -> Result<()> {
         anyhow::bail!("At least one [[nodes]] entry is required");
     }
 
-    let valid_types = ["bool", "boolean", "int", "int32", "integer", "float", "f32", "real", "double", "f64"];
+    let valid_types = [
+        "bool", "boolean", "int", "int32", "integer", "float", "f32", "real", "double", "f64",
+    ];
 
     for (i, node) in manifest.nodes.iter().enumerate() {
         let ctx = format!("nodes[{}] ('{}')", i, node.name);
@@ -253,9 +260,7 @@ pub fn validate(manifest: &Manifest) -> Result<()> {
         if node.name.is_empty() {
             anyhow::bail!("{}: name must not be empty", ctx);
         }
-        if !node.name.chars().next().unwrap().is_ascii_alphabetic()
-            && node.name.chars().next().unwrap() != '_'
-        {
+        if !node.name.chars().next().unwrap().is_ascii_alphabetic() && !node.name.starts_with('_') {
             anyhow::bail!("{}: name must start with a letter or underscore", ctx);
         }
 
@@ -269,15 +274,17 @@ pub fn validate(manifest: &Manifest) -> Result<()> {
         // Parse and validate each signal.
         let mut signal_names = std::collections::HashSet::new();
         for spec in node.inputs.iter().chain(node.outputs.iter()) {
-            let parsed = parse_signal(spec)
-                .with_context(|| format!("{}: invalid signal spec", ctx))?;
+            let parsed =
+                parse_signal(spec).with_context(|| format!("{}: invalid signal spec", ctx))?;
             if !signal_names.insert(parsed.name.clone()) {
                 anyhow::bail!("{}: duplicate signal name '{}'", ctx, parsed.name);
             }
             if !valid_types.contains(&parsed.signal_type.to_lowercase().as_str()) {
                 anyhow::bail!(
                     "{}: unknown signal type '{}' in '{}'. Valid types: bool, int, float, real",
-                    ctx, parsed.signal_type, spec
+                    ctx,
+                    parsed.signal_type,
+                    spec
                 );
             }
         }
@@ -351,9 +358,18 @@ wcet-analysis = true
 
 /// Print human-readable info about a manifest.
 pub fn print_info(manifest: &Manifest) {
-    println!("=== {} v{} ===", manifest.project.name, manifest.project.version);
-    println!("Target:   {} ({})", manifest.target.platform, manifest.target.safety_standard);
-    println!("Deadline: {}us (WCET analysis: {})", manifest.timing.deadline_us, manifest.timing.wcet_analysis);
+    println!(
+        "=== {} v{} ===",
+        manifest.project.name, manifest.project.version
+    );
+    println!(
+        "Target:   {} ({})",
+        manifest.target.platform, manifest.target.safety_standard
+    );
+    println!(
+        "Deadline: {}us (WCET analysis: {})",
+        manifest.timing.deadline_us, manifest.timing.wcet_analysis
+    );
     println!("Nodes:");
     for node in &manifest.nodes {
         println!("  {} — clock: {}ms", node.name, node.clock.base_period_ms);
