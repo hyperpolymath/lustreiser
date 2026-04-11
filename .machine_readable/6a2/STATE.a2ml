@@ -1,40 +1,40 @@
-;; SPDX-License-Identifier: PMPL-1.0-or-later
-;; Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
-;; STATE.a2ml — Current project state for lustreiser
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# STATE.a2ml — Lustreiser project state
+[metadata]
+project = "lustreiser"
+version = "0.1.0"
+last-updated = "2026-03-21"
+status = "active"
+session = "converted from scheme — 2026-04-11"
 
-(state
-  (metadata
-    (version "0.1.0")
-    (last-updated "2026-03-21")
-    (author "Jonathan D.A. Jewell"))
+[project-context]
+name = "Lustreiser"
+purpose = """Generate formally verified real-time embedded code via Lustre synchronous dataflow"""
+completion-percentage = 45
 
-  (project-context
-    (name "lustreiser")
-    (description "Generate formally verified real-time embedded code via Lustre synchronous dataflow")
-    (status "phase-1-complete")
-    (priority "—")
-    (ecosystem "-iser family (https://github.com/hyperpolymath/iseriser)")
-    (domain "Safety-critical real-time embedded systems"))
+[position]
+phase = "phase-1-complete"   # design | implementation | testing | maintenance | archived
+maturity = "experimental"  # experimental | alpha | beta | production | lts
 
-  (current-position
-    (phase "phase-1-complete")
-    (completion-percentage 45)
-    (milestone "Phase 1 complete — scaffold, CLI, manifest parser, codegen stubs, ABI types, RSR template"))
+[route-to-mvp]
+milestones = [
+  # No milestones recorded
+]
 
-  (route-to-mvp
-    (step 1 "Phase 1 — scaffold, CLI, manifest parser, ABI types [COMPLETE]")
-    (step 2 "Phase 2 — core domain logic implementation")
-    (step 3 "Phase 3 — Idris2 ABI formal proofs")
-    (step 4 "Phase 4 — Zig FFI bridge implementation")
-    (step 5 "Phase 5 — integration tests with real targets")
-    (step 6 "Phase 6 — documentation and examples")
-    (step 7 "Phase 7 — Chainguard container + CI hardening")
-    (step 8 "Phase 8 — first release (v0.1.0)"))
+[blockers-and-issues]
+issues = [
+  "No blockers — Phase 1 complete, ready for Phase 2",
+]
 
-  (blockers-and-issues
-    (none "No blockers — Phase 1 complete, ready for Phase 2"))
+[critical-next-actions]
+actions = [
+  "Begin Phase 2 — implement core domain logic for lustreiser",
+  "Write property-based tests for manifest parsing",
+  "Define Idris2 ABI proof obligations for Phase 3",
+]
 
-  (critical-next-actions
-    (action "Begin Phase 2 — implement core domain logic for lustreiser")
-    (action "Write property-based tests for manifest parsing")
-    (action "Define Idris2 ABI proof obligations for Phase 3")))
+[maintenance-status]
+last-run-utc = "2026-03-21T00:00:00Z"
+last-result = "unknown"  # unknown | pass | warn | fail

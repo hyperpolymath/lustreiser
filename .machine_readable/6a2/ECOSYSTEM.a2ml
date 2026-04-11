@@ -1,52 +1,20 @@
-;; SPDX-License-Identifier: PMPL-1.0-or-later
-;; Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
-;; ECOSYSTEM.a2ml — Ecosystem position for lustreiser
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# ECOSYSTEM.a2ml — Lustreiser ecosystem position
+[metadata]
+version = "0.1.0"
+last-updated = "2026-04-11"
 
-(ecosystem
-  (version "0.1.0")
-  (name "lustreiser")
-  (type "tool")
-  (purpose "Generate formally verified real-time embedded code via Lustre synchronous dataflow")
+[project]
+name = "Lustreiser"
+purpose = "Generate formally verified real-time embedded code via Lustre synchronous dataflow"
+role = "tool"
 
-  (position-in-ecosystem
-    (family "-iser acceleration frameworks")
-    (meta-framework "iseriser")
-    (relationship "sibling")
-    (domain "safety-critical real-time embedded systems")
-    (top-3 ("typedqliser" "chapeliser" "verisimiser")))
+[position-in-ecosystem]
+category = ""
 
-  (target-domain
-    (primary "Avionics flight control (DO-178C)")
-    (secondary "Nuclear reactor protection (IEC 61508)")
-    (tertiary "Automotive powertrain (ISO 26262)")
-    (additional "PLC programming, sensor fusion, robotic actuator control"))
-
-  (lustre-ecosystem
-    (language "Lustre — Caspi, Pilaud, Halbwachs, Plaice (Grenoble, 1987)")
-    (industrial-tool "SCADE Suite (Ansys/Esterel Technologies)")
-    (model-checker "Kind2 (University of Iowa)")
-    (reference-compiler "Lv6 / Lustre V6")
-    (related-language "Esterel — synchronous reactive (events, not dataflow)"))
-
-  (related-projects
-    (project "iseriser"
-      (relationship "meta-framework")
-      (description "Generates new -iser project scaffolding"))
-    (project "typedqliser"
-      (relationship "sibling-priority-1")
-      (description "Formal type safety for any query language"))
-    (project "chapeliser"
-      (relationship "sibling-priority-2")
-      (description "Chapel distributed computing acceleration"))
-    (project "verisimiser"
-      (relationship "sibling-priority-3")
-      (description "VeriSimDB octad database augmentation"))
-    (project "squeakwell"
-      (relationship "sibling")
-      (description "Database recovery via constraint propagation"))
-    (project "proven"
-      (relationship "dependency")
-      (description "Shared Idris2 verified library — timing proofs reuse proven primitives"))
-    (project "typell"
-      (relationship "dependency")
-      (description "Type theory engine — used for clock calculus type checking"))))
+[related-projects]
+projects = [
+  # No related projects recorded
+]

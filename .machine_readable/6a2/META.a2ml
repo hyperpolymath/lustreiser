@@ -1,59 +1,27 @@
-;; SPDX-License-Identifier: PMPL-1.0-or-later
-;; Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
-;; META.a2ml — Meta-level information for lustreiser
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# META.a2ml — Lustreiser meta-level information
+[metadata]
+version = "0.1.0"
+last-updated = "2026-03-21"
 
-(meta
-  (version "0.1.0")
-  (last-updated "2026-03-21")
+[project-info]
+license = "PMPL-1.0-or-later"
+author = "Jonathan D.A. Jewell (hyperpolymath)"
 
-  (architecture-decisions
-    (adr "001-iser-pattern"
-      (status "accepted")
-      (context "Need to make Lustre synchronous dataflow programming accessible without requiring Lustre expertise")
-      (decision "Use manifest-driven code generation: user describes control system in TOML, lustreiser generates Lustre nodes, proves timing bounds, and compiles to deterministic C")
-      (consequences "Users write zero Lustre code; all clock calculus and temporal operators generated automatically"))
+[architecture-decisions]
+decisions = [
+  # No ADRs recorded
+]
 
-    (adr "002-abi-ffi-standard"
-      (status "accepted")
-      (context "Need verified interop between Rust CLI, Lustre compilation, and embedded C output")
-      (decision "Idris2 ABI for formal timing proofs (WCET bounds, clock calculus soundness), Zig FFI for C-ABI bridge to Lustre compiler")
-      (consequences "Compile-time guarantee that every node meets its deadline; zero runtime overhead from proofs"))
+[development-practices]
+versioning = "SemVer"
+documentation = "AsciiDoc"
+build-tool = "just"
 
-    (adr "003-synchronous-hypothesis"
-      (status "accepted")
-      (context "Lustre assumes all computations complete within one clock tick (synchronous hypothesis)")
-      (decision "Enforce synchronous hypothesis via Idris2 WCET proofs: prove that worst-case execution time is strictly less than clock period for every node")
-      (consequences "Generates only code that provably meets hard real-time deadlines; rejects specifications that cannot be proven safe"))
-
-    (adr "004-deterministic-c-output"
-      (status "accepted")
-      (context "Safety-critical standards (DO-178C, IEC 61508, ISO 26262) require deterministic, bounded-time execution")
-      (decision "Generated C code must use no malloc, no recursion, no unbounded loops, and only statically allocated buffers")
-      (consequences "Output is certifiable for safety-critical deployment; memory footprint is known at compile time"))
-
-    (adr "005-rsr-template"
-      (status "accepted")
-      (context "Need consistent project structure across 29+ -iser repos")
-      (decision "All repos cloned from rsr-template-repo with full CI/CD and governance")
-      (consequences "17 workflows, SECURITY.md, CONTRIBUTING, bot directives from day one")))
-
-  (development-practices
-    (language "Rust" (purpose "CLI, manifest parsing, orchestration"))
-    (language "Idris2" (purpose "ABI formal proofs — timing bounds, clock calculus, memory layout"))
-    (language "Zig" (purpose "FFI C-ABI bridge — Lustre compilation and timing analysis"))
-    (language "Lustre" (purpose "Generated synchronous dataflow code — nodes, clocks, temporal operators"))
-    (language "C" (purpose "Final embedded output — deterministic, no-malloc, certifiable"))
-    (build-tool "cargo")
-    (ci "GitHub Actions (17 workflows)"))
-
-  (design-rationale
-    (principle "Manifest-driven"
-      (explanation "User intent captured in TOML; all generation is deterministic and reproducible"))
-    (principle "Formally verified timing"
-      (explanation "Idris2 dependent types prove WCET < clock period for every generated node"))
-    (principle "Clock calculus soundness"
-      (explanation "Every stream has exactly one clock; when/merge operators are type-checked for consistency"))
-    (principle "Zero target language exposure"
-      (explanation "Users never write Lustre, C, or Zig — the -iser handles everything"))
-    (principle "Safety-certifiable output"
-      (explanation "Generated C code targets DO-178C Level A, IEC 61508 SIL 4, ISO 26262 ASIL D"))))
+[maintenance-axes]
+scoping-first = true
+axis-1 = "must > intend > like"
+axis-2 = "corrective > adaptive > perfective"
+axis-3 = "systems > compliance > effects"
