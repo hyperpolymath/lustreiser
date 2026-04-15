@@ -2,6 +2,8 @@
 # lustreiser — Generate formally verified real-time embedded code via Lustre
 
 # Default: build and test
+import? "contractile.just"
+
 default: build test
 
 # Build release binary
