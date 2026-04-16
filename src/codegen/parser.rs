@@ -149,7 +149,7 @@ mod tests {
     #[test]
     fn test_parse_single_rate_node() {
         let m = minimal_manifest(vec!["x:int"], vec!["y:int"]);
-        let nodes = parse_nodes(&m).unwrap();
+        let nodes = parse_nodes(&m).expect("TODO: handle error");
         assert_eq!(nodes.len(), 1);
         assert_eq!(nodes[0].name, "ctrl");
         assert_eq!(nodes[0].inputs.len(), 1);
@@ -162,7 +162,7 @@ mod tests {
     #[test]
     fn test_parse_multi_rate_node() {
         let m = minimal_manifest(vec!["fast:real", "slow:real@10"], vec!["out:real"]);
-        let nodes = parse_nodes(&m).unwrap();
+        let nodes = parse_nodes(&m).expect("TODO: handle error");
         assert!(nodes[0].is_multi_rate);
         assert_eq!(nodes[0].inputs[1].rate, 10);
         assert!(nodes[0].operator_count > 0);
@@ -207,7 +207,7 @@ mod tests {
             data: None,
             options: None,
         };
-        let nodes = parse_nodes(&m).unwrap();
+        let nodes = parse_nodes(&m).expect("TODO: handle error");
         assert_eq!(nodes.len(), 2);
         assert_eq!(nodes[0].name, "sensor");
         assert_eq!(nodes[1].name, "actuator");

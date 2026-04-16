@@ -261,7 +261,7 @@ mod tests {
             name: "integrator".to_string(),
             inputs: vec![Signal::new("x", SignalType::Real)],
             outputs: vec![Signal::new("y", SignalType::Real)],
-            clock: Clock::new(10).unwrap(),
+            clock: Clock::new(10).expect("TODO: handle error"),
             operator_count: 1,
             is_multi_rate: false,
         }
@@ -301,7 +301,7 @@ mod tests {
                 Signal::new("out_slow", SignalType::Real),
                 Signal::new("out_fast", SignalType::Real),
             ],
-            clock: Clock::new(5).unwrap(),
+            clock: Clock::new(5).expect("TODO: handle error"),
             operator_count: 3,
             is_multi_rate: true,
         };
@@ -339,7 +339,7 @@ mod tests {
             name: "latch".to_string(),
             inputs: vec![Signal::new("trigger", SignalType::Bool)],
             outputs: vec![Signal::new("held", SignalType::Bool)],
-            clock: Clock::new(1).unwrap(),
+            clock: Clock::new(1).expect("TODO: handle error"),
             operator_count: 1,
             is_multi_rate: false,
         };

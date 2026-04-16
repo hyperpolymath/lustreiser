@@ -260,7 +260,7 @@ pub fn validate(manifest: &Manifest) -> Result<()> {
         if node.name.is_empty() {
             anyhow::bail!("{}: name must not be empty", ctx);
         }
-        if !node.name.chars().next().unwrap().is_ascii_alphabetic() && !node.name.starts_with('_') {
+        if !node.name.chars().next().expect("TODO: handle error").is_ascii_alphabetic() && !node.name.starts_with('_') {
             anyhow::bail!("{}: name must start with a letter or underscore", ctx);
         }
 
@@ -392,7 +392,7 @@ mod tests {
 
     #[test]
     fn test_parse_signal_basic() {
-        let s = parse_signal("pitch:real").unwrap();
+        let s = parse_signal("pitch:real").expect("TODO: handle error");
         assert_eq!(s.name, "pitch");
         assert_eq!(s.signal_type, "real");
         assert_eq!(s.rate, 1);
@@ -400,7 +400,7 @@ mod tests {
 
     #[test]
     fn test_parse_signal_with_rate() {
-        let s = parse_signal("gps_lat:real@10").unwrap();
+        let s = parse_signal("gps_lat:real@10").expect("TODO: handle error");
         assert_eq!(s.name, "gps_lat");
         assert_eq!(s.signal_type, "real");
         assert_eq!(s.rate, 10);
@@ -408,7 +408,7 @@ mod tests {
 
     #[test]
     fn test_parse_signal_trimming() {
-        let s = parse_signal("  temp : float @ 5 ").unwrap();
+        let s = parse_signal("  temp : float @ 5 ").expect("TODO: handle error");
         assert_eq!(s.name, "temp");
         assert_eq!(s.signal_type, "float");
         assert_eq!(s.rate, 5);

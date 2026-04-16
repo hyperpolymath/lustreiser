@@ -556,17 +556,17 @@ mod tests {
     #[test]
     fn test_clock_creation() {
         assert!(Clock::new(0).is_none());
-        let clk = Clock::new(10).unwrap();
+        let clk = Clock::new(10).expect("TODO: handle error");
         assert_eq!(clk.base_period_ms, 10);
         assert!((clk.frequency_hz() - 100.0).abs() < 0.001);
     }
 
     #[test]
     fn test_signal_type_parsing() {
-        assert_eq!("bool".parse::<SignalType>().unwrap(), SignalType::Bool);
-        assert_eq!("int".parse::<SignalType>().unwrap(), SignalType::Int);
-        assert_eq!("float".parse::<SignalType>().unwrap(), SignalType::Float);
-        assert_eq!("real".parse::<SignalType>().unwrap(), SignalType::Real);
+        assert_eq!("bool".parse::<SignalType>().expect("TODO: handle error"), SignalType::Bool);
+        assert_eq!("int".parse::<SignalType>().expect("TODO: handle error"), SignalType::Int);
+        assert_eq!("float".parse::<SignalType>().expect("TODO: handle error"), SignalType::Float);
+        assert_eq!("real".parse::<SignalType>().expect("TODO: handle error"), SignalType::Real);
         assert!("unknown".parse::<SignalType>().is_err());
     }
 
@@ -580,7 +580,7 @@ mod tests {
 
     #[test]
     fn test_node_validation() {
-        let clk = Clock::new(10).unwrap();
+        let clk = Clock::new(10).expect("TODO: handle error");
         let mut node = LustreNode::new("test", clk);
         let errors = node.validate();
         assert!(errors.iter().any(|e| e.contains("at least one input")));
@@ -598,15 +598,15 @@ mod tests {
     #[test]
     fn test_safety_standard_parsing() {
         assert_eq!(
-            "DO-178C".parse::<SafetyStandard>().unwrap(),
+            "DO-178C".parse::<SafetyStandard>().expect("TODO: handle error"),
             SafetyStandard::Do178c
         );
         assert_eq!(
-            "IEC-61508".parse::<SafetyStandard>().unwrap(),
+            "IEC-61508".parse::<SafetyStandard>().expect("TODO: handle error"),
             SafetyStandard::Iec61508
         );
         assert_eq!(
-            "ISO-26262".parse::<SafetyStandard>().unwrap(),
+            "ISO-26262".parse::<SafetyStandard>().expect("TODO: handle error"),
             SafetyStandard::Iso26262
         );
     }
@@ -614,15 +614,15 @@ mod tests {
     #[test]
     fn test_embedded_target_parsing() {
         assert_eq!(
-            "arm-cortex-m".parse::<EmbeddedTarget>().unwrap(),
+            "arm-cortex-m".parse::<EmbeddedTarget>().expect("TODO: handle error"),
             EmbeddedTarget::ArmCortexM
         );
         assert_eq!(
-            "riscv".parse::<EmbeddedTarget>().unwrap(),
+            "riscv".parse::<EmbeddedTarget>().expect("TODO: handle error"),
             EmbeddedTarget::RiscV
         );
         assert_eq!(
-            "x86".parse::<EmbeddedTarget>().unwrap(),
+            "x86".parse::<EmbeddedTarget>().expect("TODO: handle error"),
             EmbeddedTarget::X86
         );
     }
