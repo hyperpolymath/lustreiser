@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 # lustreiser — Generate formally verified real-time embedded code via Lustre
 
 # Default: build and test

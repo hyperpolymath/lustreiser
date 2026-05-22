@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
 # STOP — CRITICAL READING REQUIRED
@@ -112,7 +112,7 @@ lustreiser.toml → Rust CLI → Control Flow Analysis → Idris2 ABI (timing pr
 1. **No state file duplication** - Root must NOT contain STATE.a2ml, META.a2ml, etc.
 2. **Single source of truth** - `.machine_readable/` is authoritative
 3. **No stale metadata** - If root state files exist, they are OUT OF DATE
-4. **License consistency** - All code PMPL-1.0-or-later unless platform requires MPL-2.0
+4. **License consistency** - All code MPL-2.0 unless platform requires MPL-2.0
 5. **Author attribution** - Always "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"
 6. **Container images** - MUST use Chainguard base (`cgr.dev/chainguard/wolfi-base:latest` or `cgr.dev/chainguard/static:latest`)
 7. **Container runtime** - Podman, never Docker. Files are `Containerfile`, never `Dockerfile`
@@ -133,7 +133,7 @@ lustreiser/
 ├── Justfile                    # Task runner
 ├── Containerfile               # OCI build
 ├── Cargo.toml                  # Rust dependencies
-├── LICENSE                     # PMPL-1.0-or-later
+├── LICENSE                     # MPL-2.0
 ├── src/                        # Source code
 │   ├── main.rs                 # CLI entry point
 │   ├── lib.rs                  # Library API

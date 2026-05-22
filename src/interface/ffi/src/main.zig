@@ -6,7 +6,7 @@
 //
 // All types and layouts must match the Idris2 ABI definitions in Types.idr and Layout.idr.
 //
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
 const std = @import("std");

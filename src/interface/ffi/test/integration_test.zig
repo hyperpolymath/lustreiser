@@ -5,7 +5,7 @@
 // FFI function and checks that return values, error codes, and state
 // transitions match the formal ABI specification.
 //
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
 const std = @import("std");

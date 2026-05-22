@@ -1,5 +1,5 @@
 # lustreiser manifest — Flight controller example
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 #
 # This manifest describes a simplified flight controller for a fixed-wing
 # aircraft. It demonstrates:
