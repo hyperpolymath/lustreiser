@@ -1,5 +1,5 @@
 = Flight Controller Example
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: CC-BY-SA-4.0
 
 A simplified fixed-wing aircraft flight controller demonstrating lustreiser's
 core capabilities:

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: CC-BY-SA-4.0
 // Template: QUICKSTART-MAINTAINER.adoc — packaging, deploying, and maintaining
 // Replace lustreiser, {{PACKAGE_NAME}}, {{DEPS}} with actuals
 = lustreiser — Quick Start for Platform Maintainers
