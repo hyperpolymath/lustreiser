@@ -1,0 +1,171 @@
+<!--
+SPDX-License-Identifier: CC-BY-SA-4.0
+SPDX-FileCopyrightText: 2025-2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
+
+# What Is This?
+
+Lustreiser generates **formally verified real-time embedded code** via
+[Lustre](https://en.wikipedia.org/wiki/Lustre_(programming_language)),
+the synchronous dataflow language created by Caspi, Pilaud, Halbwachs,
+and Plaice at Grenoble. Lustre is the academic foundation of
+[SCADE](https://www.ansys.com/products/embedded-software/ansys-scade-suite),
+the industrial toolchain used in flight control, nuclear reactor
+protection, and automotive powertrain systems.
+
+**Lustreiser analyses your control logic, extracts dataflow patterns,
+generates Lustre nodes with clock calculus, and compiles them to
+deterministic C for embedded targets.** Every execution cycle is
+provably bounded — no jitter, no surprises, no missed deadlines.
+
+Part of the [-iser family](https://github.com/hyperpolymath/iseriser) of
+acceleration frameworks.
+
+# Key Value
+
+- **Provably bounded execution time** — Idris2 dependent types prove
+  that every cycle completes within its deadline via WCET (worst-case
+  execution time) analysis
+
+- **Deterministic output** — no heap allocation, no recursion, no
+  unbounded loops in generated C; identical inputs always produce
+  identical outputs at identical times
+
+- **Safety-standard compliance** — generated code targets DO-178C
+  (avionics), IEC 61508 (industrial safety), and ISO 26262 (automotive
+  functional safety)
+
+- **Synchronous hypothesis** — all computations complete before the next
+  clock tick, enforced by clock calculus and timing proofs
+
+# Lustre Primer
+
+Lustre is a **synchronous dataflow language**. Programs are *nodes* that
+transform *streams* of values at each clock tick.
+
+```lustre
+-- A simple counter that resets when `reset` is true
+node counter(reset: bool) returns (count: int);
+let
+  count = if reset then 0
+          else (0 -> pre(count) + 1);
+tel
+```
+
+Core operators:
+
+| `pre(x)` | Previous value of stream `x` (one tick delay) |
+|----|----|
+| `x` `→` `y` | `x` on first tick, `y` thereafter (initialisation, "followed-by") |
+| `x` `fby` `y` | Equivalent to `x` `→` `pre(y)` (followed-by shorthand) |
+| `when` | Sample a stream on a slower clock (clock calculus downsampling) |
+| `merge` | Combine streams from different clocks back to a base clock |
+
+**Clock calculus** ensures that every stream expression has a
+well-defined sampling rate. Lustreiser generates clock annotations and
+verifies them against the Idris2 ABI timing proofs.
+
+# How It Works
+
+Describe your real-time control system in `lustreiser.toml`. Lustreiser:
+
+1.  **Analyses control flow** — parses your manifest to extract dataflow
+    topology, timing requirements, and I/O declarations
+
+2.  **Generates Lustre nodes** — produces `.lus` files with correct
+    clock annotations, `pre`/`fby` temporal operators, and
+    `when`/`merge` clock calculus expressions
+
+3.  **Proves timing bounds** — the Idris2 ABI layer formally verifies
+    that worst-case execution time (WCET) for every node fits within the
+    declared clock period
+
+4.  **Compiles to deterministic C** — the Lustre compiler produces C
+    code with no `malloc`, no recursion, no unbounded loops, and
+    statically allocated buffers — suitable for bare-metal embedded
+    targets
+
+5.  **Bridges via Zig FFI** — the generated C is wrapped in a Zig FFI
+    layer for integration with Rust, Idris2, and other -iser components
+
+# Architecture
+
+Follows the hyperpolymath -iser pattern:
+
+    lustreiser.toml           ← user describes control system
+           │
+           ▼
+    ┌─────────────────────┐
+    │  Rust CLI            │   Parse manifest, validate topology
+    │  src/main.rs         │
+    └────────┬────────────┘
+             │
+             ▼
+    ┌─────────────────────┐
+    │  Control Flow        │   Extract dataflow graph, identify
+    │  Analysis            │   nodes, clocks, temporal operators
+    └────────┬────────────┘
+             │
+             ▼
+    ┌─────────────────────┐
+    │  Idris2 ABI          │   Prove timing bounds (WCET),
+    │  src/interface/abi/   │   verify clock calculus, validate
+    │                       │   stream buffer layouts
+    └────────┬────────────┘
+             │
+             ▼
+    ┌─────────────────────┐
+    │  Lustre Codegen      │   Generate .lus files with clock
+    │  src/codegen/        │   annotations, pre/fby/when/merge
+    └────────┬────────────┘
+             │
+             ▼
+    ┌─────────────────────┐
+    │  C Compilation       │   Lustre → deterministic C
+    │  (no malloc, no      │   (static buffers, bounded loops)
+    │   recursion)         │
+    └────────┬────────────┘
+             │
+             ▼
+    ┌─────────────────────┐
+    │  Zig FFI Bridge      │   C-ABI wrapper for integration
+    │  src/interface/ffi/   │   with Rust and -iser ecosystem
+    └─────────────────────┘
+
+# Use Cases
+
+- **Flight control systems** — attitude controllers, autopilot mode
+  logic, sensor fusion with guaranteed response times (DO-178C Level A)
+
+- **Engine management units** — fuel injection timing, ignition
+  scheduling, emission control loops (ISO 26262 ASIL D)
+
+- **Nuclear reactor protection** — rod insertion logic, coolant
+  monitoring, trip systems (IEC 61508 SIL 3/4)
+
+- **PLC programming** — replacing ladder logic with formally verified
+  synchronous controllers for industrial automation
+
+- **Sensor fusion** — combining accelerometer, gyroscope, and
+  magnetometer streams with proven latency bounds
+
+- **Robotic actuator control** — servo loops, trajectory planning with
+  hard real-time constraints
+
+# Build
+
+```bash
+cargo build --release
+cargo test
+```
+
+# Status
+
+**Codebase in progress.** Architecture defined, CLI scaffolded, RSR
+template complete. Codegen stubs in place — Lustre node generation,
+clock calculus, and WCET analysis are the next implementation targets.
+See `ROADMAP.adoc` for the full phased plan.
+
+# License
+
+SPDX-License-Identifier: CC-BY-SA-4.0
