@@ -1,0 +1,11 @@
+-- SPDX-License-Identifier: MPL-2.0
+-- Idris2 package for the lustreiser ABI formal proofs.
+-- Build/check with:  idris2 --build lustreiser-abi.ipkg   (from src/interface/abi/)
+package lustreiser-abi
+
+sourcedir = "."
+
+modules = Lustreiser.ABI.Types
+        , Lustreiser.ABI.Layout
+        , Lustreiser.ABI.Foreign
+        , Lustreiser.ABI.Proofs
