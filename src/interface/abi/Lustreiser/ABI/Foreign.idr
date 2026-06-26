@@ -171,6 +171,9 @@ getClockTree h = do
   if ptr == 0
     then pure Nothing
     else pure (Just (prim__getString ptr))
+  where
+    %foreign "support:idris2_getString, libidris2_support"
+    prim__getString : Bits64 -> String
 
 --------------------------------------------------------------------------------
 -- Stream Buffer Management
@@ -211,11 +214,6 @@ checkMemoryFit h ram = do
 -- String Operations
 --------------------------------------------------------------------------------
 
-||| Convert C string to Idris String
-export
-%foreign "support:idris2_getString, libidris2_support"
-prim__getString : Bits64 -> String
-
 ||| Free C string allocated by the library
 export
 %foreign "C:lustreiser_free_string, liblustreiser"
@@ -237,6 +235,9 @@ getString h = do
       let str = prim__getString ptr
       primIO (prim__freeString ptr)
       pure (Just str)
+  where
+    %foreign "support:idris2_getString, libidris2_support"
+    prim__getString : Bits64 -> String
 
 --------------------------------------------------------------------------------
 -- Error Handling
@@ -255,6 +256,9 @@ lastError = do
   if ptr == 0
     then pure Nothing
     else pure (Just (prim__getString ptr))
+  where
+    %foreign "support:idris2_getString, libidris2_support"
+    prim__getString : Bits64 -> String
 
 ||| Get error description for result code
 export
@@ -282,6 +286,9 @@ version : IO String
 version = do
   ptr <- primIO prim__version
   pure (prim__getString ptr)
+  where
+    %foreign "support:idris2_getString, libidris2_support"
+    prim__getString : Bits64 -> String
 
 ||| Get library build info
 export
@@ -294,6 +301,9 @@ buildInfo : IO String
 buildInfo = do
   ptr <- primIO prim__buildInfo
   pure (prim__getString ptr)
+  where
+    %foreign "support:idris2_getString, libidris2_support"
+    prim__getString : Bits64 -> String
 
 --------------------------------------------------------------------------------
 -- Callback Support

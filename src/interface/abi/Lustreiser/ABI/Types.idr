@@ -21,6 +21,7 @@ import Data.Bits
 import Data.So
 import Data.Vect
 import Data.Nat
+import Decidable.Equality
 
 %default total
 
@@ -33,13 +34,12 @@ public export
 data Platform = Linux | Windows | MacOS | BSD | WASM
               | ARMCortexM | RISCV | Bare
 
-||| Compile-time platform detection
-||| Defaults to Linux; override with compiler flags for embedded targets
+||| The platform this build targets. Defaults to Linux; the Rust/Zig build
+||| layer overrides this via the codegen target selection. (Previously a
+||| `%runElab` stub that required ElabReflection and did not compile.)
 public export
 thisPlatform : Platform
-thisPlatform =
-  %runElab do
-    pure Linux
+thisPlatform = Linux
 
 --------------------------------------------------------------------------------
 -- Lustre Clock Types
@@ -112,14 +112,27 @@ isStateful Fby = True
 isStateful When = False
 isStateful Merge = False
 
-||| Decidable equality for temporal operators
+||| Decidable equality for temporal operators. The off-diagonal cases
+||| discharge the disequality explicitly; the previous `decEq _ _ = No absurd`
+||| did not compile (no `Uninhabited (x = y)` instance exists for these).
 public export
 DecEq TemporalOperator where
   decEq Pre Pre = Yes Refl
   decEq Fby Fby = Yes Refl
   decEq When When = Yes Refl
   decEq Merge Merge = Yes Refl
-  decEq _ _ = No absurd
+  decEq Pre Fby = No (\case Refl impossible)
+  decEq Pre When = No (\case Refl impossible)
+  decEq Pre Merge = No (\case Refl impossible)
+  decEq Fby Pre = No (\case Refl impossible)
+  decEq Fby When = No (\case Refl impossible)
+  decEq Fby Merge = No (\case Refl impossible)
+  decEq When Pre = No (\case Refl impossible)
+  decEq When Fby = No (\case Refl impossible)
+  decEq When Merge = No (\case Refl impossible)
+  decEq Merge Pre = No (\case Refl impossible)
+  decEq Merge Fby = No (\case Refl impossible)
+  decEq Merge When = No (\case Refl impossible)
 
 --------------------------------------------------------------------------------
 -- Dataflow Streams
@@ -258,7 +271,9 @@ resultToInt NullPointer = 4
 resultToInt DeadlineViolation = 5
 resultToInt ClockError = 6
 
-||| Results are decidably equal
+||| Results are decidably equal. The off-diagonal cases discharge the
+||| disequality explicitly; the previous `decEq _ _ = No absurd` did not
+||| compile (no `Uninhabited (x = y)` instance exists for these).
 public export
 DecEq Result where
   decEq Ok Ok = Yes Refl
@@ -268,7 +283,48 @@ DecEq Result where
   decEq NullPointer NullPointer = Yes Refl
   decEq DeadlineViolation DeadlineViolation = Yes Refl
   decEq ClockError ClockError = Yes Refl
-  decEq _ _ = No absurd
+  decEq Ok Error = No (\case Refl impossible)
+  decEq Ok InvalidParam = No (\case Refl impossible)
+  decEq Ok OutOfMemory = No (\case Refl impossible)
+  decEq Ok NullPointer = No (\case Refl impossible)
+  decEq Ok DeadlineViolation = No (\case Refl impossible)
+  decEq Ok ClockError = No (\case Refl impossible)
+  decEq Error Ok = No (\case Refl impossible)
+  decEq Error InvalidParam = No (\case Refl impossible)
+  decEq Error OutOfMemory = No (\case Refl impossible)
+  decEq Error NullPointer = No (\case Refl impossible)
+  decEq Error DeadlineViolation = No (\case Refl impossible)
+  decEq Error ClockError = No (\case Refl impossible)
+  decEq InvalidParam Ok = No (\case Refl impossible)
+  decEq InvalidParam Error = No (\case Refl impossible)
+  decEq InvalidParam OutOfMemory = No (\case Refl impossible)
+  decEq InvalidParam NullPointer = No (\case Refl impossible)
+  decEq InvalidParam DeadlineViolation = No (\case Refl impossible)
+  decEq InvalidParam ClockError = No (\case Refl impossible)
+  decEq OutOfMemory Ok = No (\case Refl impossible)
+  decEq OutOfMemory Error = No (\case Refl impossible)
+  decEq OutOfMemory InvalidParam = No (\case Refl impossible)
+  decEq OutOfMemory NullPointer = No (\case Refl impossible)
+  decEq OutOfMemory DeadlineViolation = No (\case Refl impossible)
+  decEq OutOfMemory ClockError = No (\case Refl impossible)
+  decEq NullPointer Ok = No (\case Refl impossible)
+  decEq NullPointer Error = No (\case Refl impossible)
+  decEq NullPointer InvalidParam = No (\case Refl impossible)
+  decEq NullPointer OutOfMemory = No (\case Refl impossible)
+  decEq NullPointer DeadlineViolation = No (\case Refl impossible)
+  decEq NullPointer ClockError = No (\case Refl impossible)
+  decEq DeadlineViolation Ok = No (\case Refl impossible)
+  decEq DeadlineViolation Error = No (\case Refl impossible)
+  decEq DeadlineViolation InvalidParam = No (\case Refl impossible)
+  decEq DeadlineViolation OutOfMemory = No (\case Refl impossible)
+  decEq DeadlineViolation NullPointer = No (\case Refl impossible)
+  decEq DeadlineViolation ClockError = No (\case Refl impossible)
+  decEq ClockError Ok = No (\case Refl impossible)
+  decEq ClockError Error = No (\case Refl impossible)
+  decEq ClockError InvalidParam = No (\case Refl impossible)
+  decEq ClockError OutOfMemory = No (\case Refl impossible)
+  decEq ClockError NullPointer = No (\case Refl impossible)
+  decEq ClockError DeadlineViolation = No (\case Refl impossible)
 
 --------------------------------------------------------------------------------
 -- Opaque Handles
@@ -280,12 +336,15 @@ public export
 data Handle : Type where
   MkHandle : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> Handle
 
-||| Safely create a handle from a pointer value.
-||| Returns Nothing if pointer is null.
+||| Safely create a handle from a pointer value. Uses `choose` to obtain a
+||| real `So (ptr /= 0)` witness for the non-null branch. (Previously
+||| `Just (MkHandle ptr)` left the `auto` proof unsolved and did not compile.)
 public export
 createHandle : Bits64 -> Maybe Handle
-createHandle 0 = Nothing
-createHandle ptr = Just (MkHandle ptr)
+createHandle ptr =
+  case choose (ptr /= 0) of
+    Left ok => Just (MkHandle ptr {nonNull = ok})
+    Right _ => Nothing
 
 ||| Extract pointer value from handle
 public export
@@ -371,7 +430,7 @@ namespace Verify
 
   ||| Verify all timing proofs for a list of nodes
   export
-  verifyTimingBounds : Vect n LustreNode -> Either String ()
+  verifyTimingBounds : Vect k LustreNode -> Either String ()
   verifyTimingBounds [] = Right ()
   verifyTimingBounds (node :: rest) =
     case checkDeadline node of
