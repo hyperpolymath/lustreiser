@@ -260,7 +260,14 @@ pub fn validate(manifest: &Manifest) -> Result<()> {
         if node.name.is_empty() {
             anyhow::bail!("{}: name must not be empty", ctx);
         }
-        if !node.name.chars().next().expect("TODO: handle error").is_ascii_alphabetic() && !node.name.starts_with('_') {
+        if !node
+            .name
+            .chars()
+            .next()
+            .expect("TODO: handle error")
+            .is_ascii_alphabetic()
+            && !node.name.starts_with('_')
+        {
             anyhow::bail!("{}: name must start with a letter or underscore", ctx);
         }
 
