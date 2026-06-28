@@ -10,3 +10,4 @@ modules = Lustreiser.ABI.Types
         , Lustreiser.ABI.Foreign
         , Lustreiser.ABI.Proofs
         , Lustreiser.ABI.Semantics
+        , Lustreiser.ABI.Invariants
