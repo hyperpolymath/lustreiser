@@ -11,3 +11,4 @@ modules = Lustreiser.ABI.Types
         , Lustreiser.ABI.Proofs
         , Lustreiser.ABI.Semantics
         , Lustreiser.ABI.Invariants
+        , Lustreiser.ABI.FfiSeam
