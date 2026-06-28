@@ -563,10 +563,22 @@ mod tests {
 
     #[test]
     fn test_signal_type_parsing() {
-        assert_eq!("bool".parse::<SignalType>().expect("TODO: handle error"), SignalType::Bool);
-        assert_eq!("int".parse::<SignalType>().expect("TODO: handle error"), SignalType::Int);
-        assert_eq!("float".parse::<SignalType>().expect("TODO: handle error"), SignalType::Float);
-        assert_eq!("real".parse::<SignalType>().expect("TODO: handle error"), SignalType::Real);
+        assert_eq!(
+            "bool".parse::<SignalType>().expect("TODO: handle error"),
+            SignalType::Bool
+        );
+        assert_eq!(
+            "int".parse::<SignalType>().expect("TODO: handle error"),
+            SignalType::Int
+        );
+        assert_eq!(
+            "float".parse::<SignalType>().expect("TODO: handle error"),
+            SignalType::Float
+        );
+        assert_eq!(
+            "real".parse::<SignalType>().expect("TODO: handle error"),
+            SignalType::Real
+        );
         assert!("unknown".parse::<SignalType>().is_err());
     }
 
@@ -598,15 +610,21 @@ mod tests {
     #[test]
     fn test_safety_standard_parsing() {
         assert_eq!(
-            "DO-178C".parse::<SafetyStandard>().expect("TODO: handle error"),
+            "DO-178C"
+                .parse::<SafetyStandard>()
+                .expect("TODO: handle error"),
             SafetyStandard::Do178c
         );
         assert_eq!(
-            "IEC-61508".parse::<SafetyStandard>().expect("TODO: handle error"),
+            "IEC-61508"
+                .parse::<SafetyStandard>()
+                .expect("TODO: handle error"),
             SafetyStandard::Iec61508
         );
         assert_eq!(
-            "ISO-26262".parse::<SafetyStandard>().expect("TODO: handle error"),
+            "ISO-26262"
+                .parse::<SafetyStandard>()
+                .expect("TODO: handle error"),
             SafetyStandard::Iso26262
         );
     }
@@ -614,11 +632,15 @@ mod tests {
     #[test]
     fn test_embedded_target_parsing() {
         assert_eq!(
-            "arm-cortex-m".parse::<EmbeddedTarget>().expect("TODO: handle error"),
+            "arm-cortex-m"
+                .parse::<EmbeddedTarget>()
+                .expect("TODO: handle error"),
             EmbeddedTarget::ArmCortexM
         );
         assert_eq!(
-            "riscv".parse::<EmbeddedTarget>().expect("TODO: handle error"),
+            "riscv"
+                .parse::<EmbeddedTarget>()
+                .expect("TODO: handle error"),
             EmbeddedTarget::RiscV
         );
         assert_eq!(

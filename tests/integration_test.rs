@@ -11,7 +11,7 @@ use lustreiser::abi::{
     Clock, EmbeddedTarget, LustreNode, SafetyStandard, Signal, SignalType, TemporalOperator, Wcet,
 };
 use lustreiser::codegen;
-use lustreiser::manifest::{self, Manifest};
+use lustreiser::manifest::{self};
 use std::fs;
 use tempfile::TempDir;
 
@@ -305,7 +305,7 @@ fn test_abi_types_round_trip() {
     // Embedded targets.
     let arm: EmbeddedTarget = "arm-cortex-m".parse().unwrap();
     assert_eq!(arm.target_triple(), "arm-none-eabi");
-    assert!(arm.compiler_flags().len() > 0);
+    assert!(!arm.compiler_flags().is_empty());
 
     let riscv: EmbeddedTarget = "riscv".parse().unwrap();
     assert_eq!(riscv.target_triple(), "riscv32-unknown-elf");
