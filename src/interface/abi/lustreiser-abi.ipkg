@@ -12,3 +12,4 @@ modules = Lustreiser.ABI.Types
         , Lustreiser.ABI.Semantics
         , Lustreiser.ABI.Invariants
         , Lustreiser.ABI.FfiSeam
+        , Lustreiser.ABI.Capstone
