@@ -9,7 +9,3 @@ modules = Lustreiser.ABI.Types
         , Lustreiser.ABI.Layout
         , Lustreiser.ABI.Foreign
         , Lustreiser.ABI.Proofs
-        , Lustreiser.ABI.Semantics
-        , Lustreiser.ABI.Invariants
-        , Lustreiser.ABI.FfiSeam
-        , Lustreiser.ABI.Capstone
