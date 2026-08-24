@@ -1,18 +1,16 @@
-<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
-<!-- Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk> -->
+== Topology: lustreiser
 
-# Topology: lustreiser
+=== Overview
 
-## Overview
+Lustreiser generates formally verified real-time embedded code via
+Lustre, the synchronous dataflow language. It analyses control logic,
+extracts dataflow patterns, generates Lustre nodes with clock calculus,
+compiles to deterministic C for embedded targets, and proves timing
+bounds via Idris2 dependent types.
 
-Lustreiser generates formally verified real-time embedded code via Lustre, the
-synchronous dataflow language. It analyses control logic, extracts dataflow
-patterns, generates Lustre nodes with clock calculus, compiles to deterministic
-C for embedded targets, and proves timing bounds via Idris2 dependent types.
+=== Module Map
 
-## Module Map
-
-```
+....
 lustreiser/
 ├── src/
 │   ├── main.rs                          # CLI entry point (clap subcommands)
@@ -42,11 +40,11 @@ lustreiser/
 └── generated/lustreiser/                # Generated output directory
     ├── *.lus                            # Generated Lustre source files
     └── *.c                              # Generated deterministic C code
-```
+....
 
-## Data Flow
+=== Data Flow
 
-```
+....
                     ┌──────────────────┐
                     │  lustreiser.toml │  User-authored manifest
                     │  (TOML)          │  describing control system
@@ -98,49 +96,86 @@ lustreiser/
                     │  Output          │  for DO-178C, IEC 61508,
                     │                  │  ISO 26262 targets
                     └──────────────────┘
-```
+....
 
-## Key Types (Idris2 ABI)
+=== Key Types (Idris2 ABI)
 
-| Type | Module | Purpose |
-|------|--------|---------|
-| `LustreNode` | Types.idr | A computation unit with I/O streams, clock, and WCET |
-| `Clock` | Types.idr | Sampling rate (period + phase in microseconds) |
-| `DataflowStream` | Types.idr | Typed stream sampled on a specific clock |
-| `TemporalOperator` | Types.idr | Pre, Fby, When, Merge — state and clock operators |
-| `WCET` | Types.idr | Proof that a node meets its timing deadline |
-| `CompositionSafe` | Types.idr | Proof that composing two nodes preserves bounds |
-| `SafetyLevel` | Types.idr | DAL_A, SIL_4, ASIL_D certification tags |
-| `StreamBuffer` | Layout.idr | Memory layout for a stream's history buffer |
-| `NodeLayout` | Layout.idr | Complete memory layout for a node's state |
-| `FitsInRAM` | Layout.idr | Proof that all nodes fit in available static RAM |
+[width="100%",cols="27%,34%,39%",options="header",]
+|===
+|Type |Module |Purpose
+|`+LustreNode+` |Types.idr |A computation unit with I/O streams, clock,
+and WCET
 
-## Zig FFI Functions
+|`+Clock+` |Types.idr |Sampling rate (period + phase in microseconds)
 
-| Function | Purpose |
-|----------|---------|
-| `lustreiser_init` | Create compilation context (1kHz base clock default) |
-| `lustreiser_free` | Destroy context and release resources |
-| `lustreiser_compile_nodes` | Parse manifest, generate Lustre nodes |
-| `lustreiser_lustre_to_c` | Compile .lus to deterministic C |
-| `lustreiser_analyse_wcet` | Compute worst-case execution time (microseconds) |
-| `lustreiser_verify_deadline` | Check WCET < clock period |
-| `lustreiser_validate_clocks` | Verify clock calculus consistency |
-| `lustreiser_get_clock_tree` | Serialise clock hierarchy |
-| `lustreiser_calc_memory_budget` | Total static memory for all buffers |
-| `lustreiser_check_memory_fit` | Verify budget fits in target RAM |
+|`+DataflowStream+` |Types.idr |Typed stream sampled on a specific clock
 
-## Safety Standards Mapping
+|`+TemporalOperator+` |Types.idr |Pre, Fby, When, Merge — state and
+clock operators
 
-| Standard | Domain | Lustreiser Relevance |
-|----------|--------|---------------------|
-| DO-178C Level A | Avionics (catastrophic failure) | Flight control, autopilot, sensor fusion |
-| IEC 61508 SIL 3/4 | Industrial (nuclear, chemical) | Reactor protection, trip systems |
-| ISO 26262 ASIL D | Automotive (life-threatening) | Engine management, braking, steering |
+|`+WCET+` |Types.idr |Proof that a node meets its timing deadline
 
-## Dependencies
+|`+CompositionSafe+` |Types.idr |Proof that composing two nodes
+preserves bounds
 
-- **Rust** (cargo): CLI, manifest parsing, orchestration
-- **Idris2**: Formal proofs of timing bounds and memory layout
-- **Zig**: C-ABI bridge, embedded cross-compilation
-- **Lustre**: Generated synchronous dataflow code (not a build dependency — generated)
+|`+SafetyLevel+` |Types.idr |DAL_A, SIL_4, ASIL_D certification tags
+
+|`+StreamBuffer+` |Layout.idr |Memory layout for a stream’s history
+buffer
+
+|`+NodeLayout+` |Layout.idr |Complete memory layout for a node’s state
+
+|`+FitsInRAM+` |Layout.idr |Proof that all nodes fit in available static
+RAM
+|===
+
+=== Zig FFI Functions
+
+[width="100%",cols="53%,47%",options="header",]
+|===
+|Function |Purpose
+|`+lustreiser_init+` |Create compilation context (1kHz base clock
+default)
+
+|`+lustreiser_free+` |Destroy context and release resources
+
+|`+lustreiser_compile_nodes+` |Parse manifest, generate Lustre nodes
+
+|`+lustreiser_lustre_to_c+` |Compile .lus to deterministic C
+
+|`+lustreiser_analyse_wcet+` |Compute worst-case execution time
+(microseconds)
+
+|`+lustreiser_verify_deadline+` |Check WCET < clock period
+
+|`+lustreiser_validate_clocks+` |Verify clock calculus consistency
+
+|`+lustreiser_get_clock_tree+` |Serialise clock hierarchy
+
+|`+lustreiser_calc_memory_budget+` |Total static memory for all buffers
+
+|`+lustreiser_check_memory_fit+` |Verify budget fits in target RAM
+|===
+
+=== Safety Standards Mapping
+
+[width="100%",cols="27%,20%,53%",options="header",]
+|===
+|Standard |Domain |Lustreiser Relevance
+|DO-178C Level A |Avionics (catastrophic failure) |Flight control,
+autopilot, sensor fusion
+
+|IEC 61508 SIL 3/4 |Industrial (nuclear, chemical) |Reactor protection,
+trip systems
+
+|ISO 26262 ASIL D |Automotive (life-threatening) |Engine management,
+braking, steering
+|===
+
+=== Dependencies
+
+* *Rust* (cargo): CLI, manifest parsing, orchestration
+* *Idris2*: Formal proofs of timing bounds and memory layout
+* *Zig*: C-ABI bridge, embedded cross-compilation
+* *Lustre*: Generated synchronous dataflow code (not a build dependency
+— generated)
