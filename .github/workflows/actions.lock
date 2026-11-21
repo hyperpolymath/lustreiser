@@ -13,7 +13,7 @@ workflows:
         - 'actions/configure-pages@v6.0.0'
         - 'actions/deploy-pages@v5.0.1'
         - 'actions/upload-pages-artifact@v5.0.0'
-        - 'haskell-actions/setup@v2.12.0'
+        - 'haskell-actions/setup@v2.12.1'
     '.github/workflows/codeql.yml':
         - 'actions/checkout@v7.0.1'
         - 'github/codeql-action@v4.39.3'
@@ -95,9 +95,9 @@ dependencies:
         commit: 'sha1-33d7b85da1a04171e211befe2c739303b9a4c066'
         owner_id: 9919
         repo_id: 259445878
-    'haskell-actions/setup@v2.12.0':
-        ref: 'v2.12.0'
-        commit: 'sha1-6037f33647c3f17758a2356c80fc4a53d7e0685d'
+    'haskell-actions/setup@v2.12.1':
+        ref: 'v2.12.1'
+        commit: 'sha1-0f8e8c99d88aeb3fbfd523f1ef2c6f762d10d64d'
         owner_id: 75048950
         repo_id: 623796603
     'hyperpolymath/smtp-notify-action@v0.5.1':
